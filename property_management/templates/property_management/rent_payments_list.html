@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rent Payments - Property Management{% endblock %}
+
+{% block content %}
+<section class="rent-payments-section py-5">
+  <div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <h1 class="display-5 mb-2">
+          <i class="fas fa-money-bill-wave text-success"></i> Rent Payments
+        </h1>
+        <p class="text-muted">Track and manage all rent payments from tenants</p>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <a href="{% url 'admin:property_management_rentpayment_add' %}" class="btn btn-success">
+          <i class="fas fa-plus"></i> Record Payment
+        </a>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <form method="get" class="row g-3">
+              <div class="col-md-6">
+                <label for="status" class="form-label">Payment Status</label>
+                <select class="form-select" id="status" name="status">
+                  <option value="">All Status</option>
+                  <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Paid</option>
+                  <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                  <option value="partial" {% if status_filter == 'partial' %}selected{% endif %}>Partial</option>
+                  <option value="overdue" {% if status_filter == 'overdue' %}selected{% endif %}>Overdue</option>
+                </select>
+              </div>
+              <div class="col-md-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-success w-100">
+                  <i class="fas fa-filter"></i> Filter
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm bg-light">
+          <div class="card-body">
+            <h6 class="card-title text-muted mb-2">Total Payments</h6>
+            <h3 class="text-success">{{ payments.count }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm bg-light">
+          <div class="card-body">
+            <h6 class="card-title text-muted mb-2">Paid</h6>
+            <h3 class="text-success">
+              {% with paid_count=payments|dictsort:"status"|length %}
+                {{ paid_count }}
+              {% endwith %}
+            </h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm bg-light">
+          <div class="card-body">
+            <h6 class="card-title text-muted mb-2">Pending</h6>
+            <h3 class="text-warning">
+              {% with pending_count=payments|dictsort:"status"|length %}
+                {{ pending_count }}
+              {% endwith %}
+            </h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm bg-light">
+          <div class="card-body">
+            <h6 class="card-title text-muted mb-2">Overdue</h6>
+            <h3 class="text-danger">
+              {% with overdue_count=payments|dictsort:"status"|length %}
+                {{ overdue_count }}
+              {% endwith %}
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payments Table -->
+    {% if payments %}
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Tenant</th>
+                  <th>Property</th>
+                  <th>Due Date</th>
+                  <th>Amount Due</th>
+                  <th>Amount Paid</th>
+                  <th>Status</th>
+                  <th>Payment Method</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for payment in payments %}
+                  <tr>
+                    <td><strong>{{ payment.tenant.get_full_name }}</strong></td>
+                    <td>{{ payment.tenant.managed_property.listing.title }}</td>
+                    <td>{{ payment.due_date|date:"M d, Y" }}</td>
+                    <td>KES {{ payment.amount_due|floatformat:0 }}</td>
+                    <td>KES {{ payment.amount_paid|floatformat:0 }}</td>
+                    <td>
+                      {% if payment.status == 'paid' %}
+                        <span class="badge bg-success">Paid</span>
+                      {% elif payment.status == 'pending' %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                      {% elif payment.status == 'partial' %}
+                        <span class="badge bg-info">Partial</span>
+                      {% else %}
+                        <span class="badge bg-danger">Overdue</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ payment.get_payment_method_display|default:"-" }}</td>
+                    <td>
+                      <a href="{% url 'admin:property_management_rentpayment_change' payment.pk %}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="alert alert-info text-center py-5">
+        <i class="fas fa-info-circle fa-2x mb-3"></i>
+        <h5>No Payments Found</h5>
+        <p class="mb-0">There are currently no rent payments matching your filters.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+

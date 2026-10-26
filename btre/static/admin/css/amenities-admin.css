@@ -1,0 +1,36 @@
+/* Amenities field styling */
+.field-amenities textarea {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.5;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    padding: 12px;
+    background: #fafafa;
+}
+
+.field-amenities textarea:focus {
+    border-color: #007cba;
+    background: #ffffff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.1);
+}
+
+.field-amenities .help {
+    background: #e8f4f8;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 8px;
+    border-left: 4px solid #007cba;
+    font-size: 13px;
+}
+
+/* Fieldset descriptions */
+.fieldset-description {
+    background: #f8f9fa;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+    border-left: 4px solid #28a745;
+    font-style: italic;
+    color: #495057;
+}

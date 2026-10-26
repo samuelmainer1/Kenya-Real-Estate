@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% comment %}
+  Branded 404 page. Rendered both by Django's built-in debug handler and by
+  btre.views.page_not_found in production, so it must work with an empty
+  context (no request object, no SEO overrides).
+{% endcomment %}
+
+{% block title %}Page Not Found | {{ site_name }}{% endblock %}
+
+{% block meta_description %}The page you were looking for could not be found on {{ site_name }}. Browse our property listings or return to the homepage.{% endblock %}
+
+{% block robots %}noindex, follow{% endblock %}
+
+{% block og_title %}Page Not Found | {{ site_name }}{% endblock %}
+
+{% block og_description %}The page you were looking for could not be found. Browse our property listings or return to the homepage.{% endblock %}
+
+{% block extra_css %}
+<style>
+  .error-page {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #10284e 0%, #1b3a6b 55%, #30caa0 100%);
+    color: #fff;
+    padding: 4rem 0;
+    font-family: 'Poppins', sans-serif;
+  }
+  .error-page .error-code {
+    font-size: clamp(5rem, 16vw, 10rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: #30caa0;
+    text-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+    margin-bottom: 0.5rem;
+  }
+  .error-page h1 {
+    font-size: clamp(1.5rem, 3.2vw, 2.25rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  .error-page p {
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 34rem;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+  .error-page .error-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+  .error-page .btn {
+    padding: 0.75rem 1.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+  .error-page .btn:hover { transform: translateY(-2px); }
+  .error-page .btn-solid {
+    background: #30caa0;
+    color: #06263a;
+    box-shadow: 0 10px 28px rgba(48, 202, 160, 0.34);
+  }
+  .error-page .btn-solid:hover { background: #4dd4b0; }
+  .error-page .btn-ghost {
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    color: #fff;
+  }
+  .error-page .btn-ghost:hover { background: rgba(255, 255, 255, 0.12); }
+  .error-page .error-hint {
+    margin-top: 2rem;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="error-page">
+  <div class="container text-center">
+    <div class="error-code">404</div>
+    <h1>We couldn't find that page</h1>
+    <p>
+      The page may have been moved, renamed, or the property you are looking for
+      is no longer listed. Let's get you back to the properties.
+    </p>
+    <div class="error-actions">
+      <a href="{% url 'listings' %}" class="btn btn-solid">
+        <i class="fas fa-home"></i> Browse Properties
+      </a>
+      <a href="{% url 'index' %}" class="btn btn-ghost">
+        <i class="fas fa-arrow-left"></i> Back to Home
+      </a>
+      <a href="{% url 'contact' %}" class="btn btn-ghost">
+        <i class="fas fa-envelope"></i> Contact Us
+      </a>
+    </div>
+    <p class="error-hint">
+      Looking for a specific property? Search our
+      <a href="{% url 'listings' %}" style="color:#30caa0;">current listings</a>
+      or <a href="{% url 'contact' %}" style="color:#30caa0;">talk to an agent</a>.
+    </p>
+  </div>
+</section>
+{% endblock %}

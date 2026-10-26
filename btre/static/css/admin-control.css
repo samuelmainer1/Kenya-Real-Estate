@@ -1,0 +1,983 @@
+/* Control Centre chrome for the Django admin (sidebar, header, shell).
+ *
+ * Loaded after admin.css on every admin page via templates/admin/base_site.html.
+ *
+ * Colour strategy: Django's own custom properties (--body-bg, --body-fg,
+ * --hairline-color, --darkened-bg, --link-fg ...) are used for surfaces and
+ * text so light/dark mode keep working, while the brand navy/green are used for
+ * accents. Everything brand-specific is declared per theme below, so a single
+ * set of component rules works in both modes.
+ */
+
+:root,
+html[data-theme="light"] {
+  --kc-navy: #10284e;
+  --kc-navy-soft: #1b4a7a;
+  --kc-navy-deep: #0b1c36;
+  --kc-green: #30caa0;
+  --kc-green-dark: #1f8f70;
+  --kc-green-tint: rgba(48, 202, 160, 0.12);
+  --kc-sidebar-bg: #0d2140;
+  --kc-sidebar-bg-2: #122b4f;
+  --kc-sidebar-fg: #cbd8e8;
+  --kc-sidebar-muted: #7f93ae;
+  --kc-sidebar-hover: rgba(255, 255, 255, 0.07);
+  --kc-sidebar-active: rgba(48, 202, 160, 0.16);
+  --kc-sidebar-border: rgba(255, 255, 255, 0.09);
+  --kc-surface: #ffffff;
+  --kc-surface-alt: #f7f9fc;
+  --kc-border: #e2e8f0;
+  --kc-text: #0f172a;
+  --kc-muted: #64748b;
+  --kc-radius: 10px;
+  --kc-sidebar-width: 268px;
+}
+
+html[data-theme="dark"] {
+  --kc-navy: #16233a;
+  --kc-navy-soft: #24446e;
+  --kc-navy-deep: #0e1728;
+  --kc-green: #34d3a6;
+  --kc-green-dark: #2bb791;
+  --kc-green-tint: rgba(52, 211, 166, 0.16);
+  --kc-sidebar-bg: #0b1626;
+  --kc-sidebar-bg-2: #101d31;
+  --kc-sidebar-fg: #c2d0e0;
+  --kc-sidebar-muted: #7b8ea6;
+  --kc-sidebar-hover: rgba(255, 255, 255, 0.08);
+  --kc-sidebar-active: rgba(52, 211, 166, 0.2);
+  --kc-sidebar-border: rgba(255, 255, 255, 0.1);
+  --kc-surface: var(--body-bg, #1e1e1e);
+  --kc-surface-alt: var(--darkened-bg, #262626);
+  --kc-border: var(--hairline-color, #3a3a3a);
+  --kc-text: var(--body-fg, #e8e8e8);
+  --kc-muted: var(--body-quiet-color, #a8a8a8);
+}
+
+/* ---------- Shared bits ---------- */
+
+.kc-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.kc-icon {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+.kc-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Header ---------- */
+
+/* Django renders `#header` (branding + user tools) and the breadcrumbs before
+   `.main`, which makes them span the full width and pushes the sidebar down.
+   The Control Centre docks the sidebar to the top-left instead, so the header
+   becomes a normal block that is shifted right by the sidebar's width. */
+#container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 56px;
+  margin-left: var(--kc-sidebar-width);
+  padding: 0 24px;
+  background: linear-gradient(100deg, var(--kc-navy) 0%, var(--kc-navy-soft) 70%, var(--kc-green-dark) 160%);
+  color: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
+  transition: margin-left 0.18s ease;
+}
+
+html.kc-nav-collapsed #header,
+html.kc-nav-collapsed div.breadcrumbs {
+  margin-left: 0;
+}
+
+/* Popups have no sidebar, so no offset either. */
+body.popup #header,
+body.popup div.breadcrumbs {
+  margin-left: 0;
+}
+
+#branding {
+  display: flex;
+  align-items: center;
+}
+
+#branding h1#head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #fff !important;
+  font-family: Poppins, "Segoe UI", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+#branding .brand_img {
+  height: 32px;
+  width: 32px;
+  padding: 2px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #fff;
+  object-fit: contain;
+}
+
+#branding .brand_text {
+  color: #fff;
+}
+
+#branding .brand_suffix {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(48, 202, 160, 0.45);
+  background: rgba(48, 202, 160, 0.2);
+  color: #a9f6e1;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+#user-tools {
+  margin-left: auto;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12.5px;
+  text-align: right;
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+/* Django uppercases the header by default; the Control Centre keeps the user
+   tools in sentence case and separates items with a quiet dot instead of "/". */
+#user-tools strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+#user-tools a,
+#user-tools a:link,
+#user-tools a:visited {
+  color: #fff;
+  border-bottom: 1px solid rgba(48, 202, 160, 0.55);
+  text-decoration: none;
+  padding-bottom: 1px;
+}
+
+#user-tools a:hover,
+#user-tools a:focus {
+  border-bottom-color: #fff;
+  text-decoration: none;
+}
+
+#user-tools form#logout-form {
+  display: inline;
+  margin: 0;
+}
+
+#user-tools form#logout-form button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(48, 202, 160, 0.55);
+}
+
+#user-tools form#logout-form button:hover {
+  border-bottom-color: #fff;
+}
+
+/* Theme toggle button, keeps Django's behaviour. */
+#user-tools .theme-toggle {
+  vertical-align: middle;
+  filter: invert(1) brightness(1.6);
+}
+
+/* ---------- Breadcrumbs ---------- */
+
+div.breadcrumbs {
+  margin-left: var(--kc-sidebar-width);
+  padding: 9px 24px;
+  background: var(--kc-navy-soft);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12.5px;
+  transition: margin-left 0.18s ease;
+}
+
+div.breadcrumbs a,
+div.breadcrumbs a:link {
+  color: #d8fbf0;
+  text-decoration: none;
+}
+
+div.breadcrumbs a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+html[data-theme="dark"] div.breadcrumbs {
+  background: var(--kc-sidebar-bg-2);
+}
+
+/* ---------- Sidebar shell ---------- */
+
+/* The sidebar is fixed (so it stays put while the content scrolls); `.main`
+   reserves its width instead of being a flex row with it. */
+.main {
+  align-items: stretch;
+  margin-left: var(--kc-sidebar-width);
+  transition: margin-left 0.18s ease;
+}
+
+html.kc-nav-collapsed .main {
+  margin-left: 0;
+}
+
+/* Django hides the sidebar until JS adds `.shifted`; the Control Centre keeps it
+   open by default and remembers the choice in localStorage (admin-control.js).
+   ``html.kc-nav-collapsed``/``html.kc-nav-ready`` drive that. */
+.main > .kc-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 40;
+  width: var(--kc-sidebar-width);
+  height: 100vh;
+  margin: 0;
+  border: 0;
+  border-right: 1px solid var(--kc-sidebar-border);
+  background: linear-gradient(180deg, var(--kc-sidebar-bg) 0%, var(--kc-sidebar-bg-2) 100%);
+  color: var(--kc-sidebar-fg);
+  overflow: hidden;
+  visibility: visible;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.18s ease, visibility 0.18s ease;
+}
+
+.main > .kc-sidebar + .content {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  padding: 22px 26px 40px;
+  box-sizing: border-box;
+}
+
+/* Django caps `#content` (max-width: 1600px with auto margins), which left the
+   dashboard stranded in the middle of a wide screen while the right column sat
+   far away. The Control Centre uses the full width of the content area. */
+.main > .kc-sidebar + .content > #content {
+  max-width: none;
+  width: 100%;
+}
+
+/* Collapsed: slide the panel out but keep it mountable. */
+html.kc-nav-collapsed .main > .kc-sidebar {
+  visibility: hidden;
+  transform: translateX(-100%);
+}
+
+/* Hide Django's own 23px toggle strip; the Control Centre has its own button. */
+.toggle-nav-sidebar {
+  display: none;
+}
+
+/* ---------- Mobile drawer button (in the top bar) ---------- */
+
+.kc-nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin: 0 2px 0 0;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+}
+
+.kc-nav-toggle:hover,
+.kc-nav-toggle:focus {
+  border-color: var(--kc-green);
+  background: rgba(48, 202, 160, 0.2);
+  color: #fff;
+}
+
+.kc-nav-toggle .kc-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------- Sidebar head ---------- */
+
+.kc-sidebar-head {
+  flex: 0 0 auto;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--kc-sidebar-border);
+}
+
+.kc-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.kc-sidebar-brand:hover {
+  text-decoration: none;
+}
+
+.kc-sidebar-logo {
+  width: 36px;
+  height: 36px;
+  padding: 3px;
+  box-sizing: border-box;
+  border-radius: 9px;
+  background: #fff;
+  object-fit: contain;
+}
+
+.kc-sidebar-brand > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.kc-sidebar-brand strong {
+  font-family: Poppins, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+
+.kc-sidebar-brand small {
+  overflow: hidden;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--kc-green);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Search filter ---------- */
+
+.kc-sidebar-search {
+  position: relative;
+  flex: 0 0 auto;
+  padding: 10px 14px;
+}
+
+.kc-sidebar-search .kc-icon {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--kc-sidebar-muted);
+  pointer-events: none;
+}
+
+#kc-nav-filter {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 8px 10px 8px 32px;
+  border: 1px solid var(--kc-sidebar-border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-family: inherit;
+  font-size: 12.5px;
+}
+
+#kc-nav-filter::placeholder {
+  color: var(--kc-sidebar-muted);
+}
+
+#kc-nav-filter:focus {
+  outline: none;
+  border-color: var(--kc-green);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- Scrollable nav body ---------- */
+
+.kc-sidebar-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 10px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+.kc-sidebar-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.kc-sidebar-scroll::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.kc-nav-group {
+  margin-bottom: 2px;
+}
+
+.kc-nav-group-summary {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 8px;
+  border-radius: 7px;
+  color: var(--kc-sidebar-fg);
+  font-family: Poppins, "Segoe UI", sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.kc-nav-group-summary::-webkit-details-marker {
+  display: none;
+}
+
+.kc-nav-group-summary:hover {
+  background: var(--kc-sidebar-hover);
+}
+
+.kc-nav-group-summary .kc-icon:first-child {
+  color: var(--kc-green);
+  opacity: 0.9;
+}
+
+.kc-nav-group-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.kc-nav-chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--kc-sidebar-muted);
+  transition: transform 0.16s ease;
+}
+
+.kc-nav-group[open] > .kc-nav-group-summary .kc-nav-chevron {
+  transform: rotate(180deg);
+}
+
+.kc-nav-group[open] > .kc-nav-group-summary {
+  color: #fff;
+}
+
+/* ---------- Nav links ---------- */
+
+.kc-nav-links {
+  margin: 0 0 6px;
+  padding: 0 0 0 10px;
+  list-style: none;
+  border-left: 1px solid var(--kc-sidebar-border);
+  margin-left: 15px;
+}
+
+.kc-nav-link-row {
+  display: flex;
+  align-items: center;
+  border-radius: 7px;
+  margin: 1px 0;
+}
+
+.kc-nav-link-row:hover {
+  background: var(--kc-sidebar-hover);
+}
+
+.kc-nav-link {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 7px 6px 7px 8px;
+  border-radius: 7px;
+  color: var(--kc-sidebar-fg);
+  font-size: 12.5px;
+  text-decoration: none;
+}
+
+.kc-nav-link:link,
+.kc-nav-link:visited {
+  color: var(--kc-sidebar-fg);
+  text-decoration: none;
+}
+
+.kc-nav-link:hover,
+.kc-nav-link:focus {
+  color: #fff;
+  text-decoration: none;
+}
+
+.kc-nav-link .kc-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--kc-sidebar-muted);
+  opacity: 0.85;
+}
+
+.kc-nav-link-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.kc-nav-count {
+  flex: 0 0 auto;
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--kc-sidebar-muted);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Current page */
+.kc-nav-link-row-current,
+.kc-nav-link-row-current:hover {
+  background: var(--kc-sidebar-active);
+  box-shadow: inset 3px 0 0 var(--kc-green);
+}
+
+.kc-nav-link-current,
+.kc-nav-link-current:link,
+.kc-nav-link-current:visited {
+  color: #fff;
+  font-weight: 600;
+}
+
+.kc-nav-link-current .kc-icon {
+  color: var(--kc-green);
+  opacity: 1;
+}
+
+.kc-nav-link-current .kc-nav-count {
+  background: rgba(48, 202, 160, 0.28);
+  color: #d6fff4;
+}
+
+/* Quick add (+), revealed on hover/focus to keep the list calm. */
+.kc-nav-add {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 5px;
+  border-radius: 6px;
+  color: var(--kc-sidebar-muted);
+  opacity: 0;
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+.kc-nav-add .kc-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.kc-nav-link-row:hover .kc-nav-add,
+.kc-nav-add:focus-visible {
+  opacity: 1;
+}
+
+.kc-nav-add:hover,
+.kc-nav-add:focus {
+  background: var(--kc-green);
+  color: #06251c;
+  text-decoration: none;
+  opacity: 1;
+}
+
+/* Site shortcut links are external (new tab). */
+.kc-nav-links-compact .kc-nav-link {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 12px;
+  color: var(--kc-sidebar-muted);
+}
+
+.kc-nav-link-external:hover,
+.kc-nav-link-external:focus {
+  color: #fff;
+}
+
+.kc-nav-ext-icon {
+  width: 11px !important;
+  height: 11px !important;
+  opacity: 0.5;
+}
+
+.kc-nav-sublabel {
+  margin: 8px 0 2px 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kc-sidebar-muted);
+  opacity: 0.8;
+}
+
+.kc-nav-empty {
+  margin: 6px 10px;
+  font-size: 12px;
+  color: var(--kc-sidebar-muted);
+}
+
+/* Hidden by the search filter. */
+.kc-nav-link-row[hidden],
+.kc-nav-group[hidden],
+.kc-nav-sublabel[hidden] {
+  display: none !important;
+}
+
+/* ---------- Sidebar footer ---------- */
+
+.kc-sidebar-foot {
+  flex: 0 0 auto;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--kc-sidebar-border);
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.kc-sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 4px 2px 8px;
+}
+
+.kc-sidebar-avatar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--kc-green), var(--kc-green-dark));
+  color: #06251c;
+  font-family: Poppins, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.kc-sidebar-user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.kc-sidebar-user-meta strong {
+  overflow: hidden;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.kc-sidebar-user-meta small {
+  color: var(--kc-sidebar-muted);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.kc-sidebar-view-site {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--kc-sidebar-border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+
+.kc-sidebar-view-site:hover,
+.kc-sidebar-view-site:focus {
+  border-color: var(--kc-green);
+  background: rgba(48, 202, 160, 0.18);
+  color: #fff;
+  text-decoration: none;
+}
+
+.kc-sidebar-view-site .kc-icon {
+  color: var(--kc-green);
+}
+
+/* ---------- Responsive ---------- */
+
+/* Django hides its sidebar below 767px; the Control Centre turns it into an
+   off-canvas drawer driven by .kc-nav-open on <body>. */
+@media (max-width: 767px) {
+  .kc-nav-toggle {
+    display: inline-flex;
+  }
+
+  /* Off-canvas drawer: the header/breadcrumbs/content drop their offset and
+     the panel slides in over them when `.kc-nav-open` is on <body>. */
+  #header,
+  div.breadcrumbs,
+  .main {
+    margin-left: 0;
+  }
+
+  .main {
+    display: block;
+  }
+
+  .main > .kc-sidebar {
+    z-index: 60;
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.35);
+  }
+
+  body.kc-nav-open .main > .kc-sidebar {
+    visibility: visible;
+    transform: translateX(0);
+  }
+
+  html.kc-nav-collapsed .main > .kc-sidebar {
+    /* Collapsed state is a desktop preference; the drawer is driven by
+       .kc-nav-open on phones. */
+    visibility: visible;
+    transform: translateX(-100%);
+  }
+
+  .main > .kc-sidebar + .content {
+    padding: 16px 14px 32px;
+  }
+
+  body.kc-nav-open {
+    overflow: hidden;
+  }
+
+  /* Scrim behind the drawer. */
+  .kc-nav-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    border: 0;
+    background: rgba(6, 16, 30, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  body.kc-nav-open .kc-nav-scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #user-tools {
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 768px) {
+  .kc-nav-scrim {
+    display: none;
+  }
+}
+
+/* ---------- Admin content polish ---------- */
+
+/* Tighter, card-like modules that match the sidebar's visual language. */
+#content .module {
+  margin-bottom: 18px;
+  border-radius: var(--kc-radius);
+  border: 1px solid var(--kc-border);
+  overflow: hidden;
+}
+
+#content .module > h2,
+#content .module > caption,
+#content .inline-group h2 {
+  padding: 10px 14px;
+  font-family: Poppins, "Segoe UI", sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: linear-gradient(100deg, var(--kc-navy) 0%, var(--kc-navy-soft) 100%);
+  color: #fff;
+}
+
+/* Django's dashboard.css (loaded after this file via admin/index.html's
+   extrastyle) paints the recent-actions module with its own blue gradient and
+   zero radius. Re-assert the Control Centre look for that module. */
+#content #recent-actions-module > h2,
+#content .module.recent-actions > h2 {
+  padding: 10px 14px;
+  border-radius: var(--kc-radius) var(--kc-radius) 0 0;
+  background: linear-gradient(100deg, var(--kc-navy) 0%, var(--kc-navy-soft) 100%);
+  font-family: Poppins, "Segoe UI", sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+#content #recent-actions-module > h3 {
+  margin: 0;
+  padding: 10px 14px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--body-fg, #111827);
+}
+
+#content #recent-actions-module .actionlist {
+  margin: 0;
+  padding: 4px 14px 12px;
+  list-style: none;
+}
+
+#content h1 {
+  font-family: Poppins, "Segoe UI", sans-serif;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Primary buttons use the brand green so the "do the thing" action stands out
+   against the navy secondary buttons. */
+.button.default,
+input[type="submit"].default,
+.submit-row input.default {
+  background: var(--kc-green-dark);
+  border-color: var(--kc-green-dark);
+  color: #fff;
+}
+
+.button.default:hover,
+input[type="submit"].default:hover,
+.submit-row input.default:hover {
+  background: var(--kc-green);
+  border-color: var(--kc-green);
+  color: #06251c;
+}
+
+/* Object tools (Add / History) sit at the top-right of changelists. */
+.object-tools a:link,
+.object-tools a:visited {
+  border-radius: 6px;
+  background: var(--kc-navy);
+}
+
+.object-tools a:hover,
+.object-tools a:focus {
+  background: var(--kc-green-dark);
+}
+
+/* Messages above the content: rounded and brand-tinted. */
+#content .messagelist li {
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+#content .messagelist li.success {
+  border-left: 4px solid var(--kc-green-dark);
+}
+
+/* Changelist table headers echo the sidebar's uppercase labels. */
+#changelist table thead th {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+#changelist-filter h2 {
+  background: var(--kc-navy);
+}
+
+#changelist-filter li.selected a {
+  color: var(--kc-green-dark);
+  font-weight: 600;
+}
+
+html[data-theme="dark"] #changelist-filter li.selected a {
+  color: var(--kc-green);
+}
+
+/* Focus ring that matches the login screen. */
+#content a:focus-visible,
+#content button:focus-visible,
+#content input:focus-visible,
+#content select:focus-visible,
+#content textarea:focus-visible,
+.kc-sidebar a:focus-visible,
+.kc-sidebar button:focus-visible,
+.kc-sidebar input:focus-visible {
+  outline: 2px solid var(--kc-green);
+  outline-offset: 1px;
+}
+
+/* Skip link is brand-coloured but must stay visible on focus. */
+.skip-to-content-link:focus {
+  background: var(--kc-green);
+  color: #06251c;
+}
+
+
+

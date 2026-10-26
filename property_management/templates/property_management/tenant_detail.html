@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ tenant.get_full_name }} - Tenant Details{% endblock %}
+
+{% block content %}
+<section class="tenant-detail-section py-5">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'tenant_list' %}">Tenants</a></li>
+        <li class="breadcrumb-item active">{{ tenant.get_full_name }}</li>
+      </ol>
+    </nav>
+
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Tenant Information -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0"><i class="fas fa-user text-success"></i> Tenant Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <strong>Full Name:</strong> {{ tenant.get_full_name }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Status:</strong>
+                {% if tenant.status == 'active' %}
+                  <span class="badge bg-success">Active</span>
+                {% elif tenant.status == 'inactive' %}
+                  <span class="badge bg-secondary">Inactive</span>
+                {% elif tenant.status == 'moved_out' %}
+                  <span class="badge bg-info">Moved Out</span>
+                {% else %}
+                  <span class="badge bg-danger">Evicted</span>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Email:</strong> <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a>
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Phone:</strong> <a href="tel:{{ tenant.phone }}">{{ tenant.phone }}</a>
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>National ID:</strong> {{ tenant.national_id }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Property:</strong> {{ tenant.managed_property.listing.title }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lease Information -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0"><i class="fas fa-file-contract text-success"></i> Lease Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <strong>Move-in Date:</strong> {{ tenant.move_in_date|date:"M d, Y" }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Move-out Date:</strong> 
+                {% if tenant.move_out_date %}
+                  {{ tenant.move_out_date|date:"M d, Y" }}
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Lease Start:</strong> {{ tenant.lease_start_date|date:"M d, Y" }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Lease End:</strong> {{ tenant.lease_end_date|date:"M d, Y" }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Monthly Rent:</strong> <span class="text-success">KES {{ tenant.monthly_rent|floatformat:0 }}</span>
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Deposit Amount:</strong> KES {{ tenant.deposit_amount|floatformat:0 }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Emergency Contact -->
+        {% if tenant.emergency_contact_name %}
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-light border-bottom">
+              <h5 class="mb-0"><i class="fas fa-phone text-success"></i> Emergency Contact</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <strong>Name:</strong> {{ tenant.emergency_contact_name }}
+                </div>
+                <div class="col-md-6 mb-3">
+                  <strong>Phone:</strong> <a href="tel:{{ tenant.emergency_contact_phone }}">{{ tenant.emergency_contact_phone }}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Rent Payment History -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0"><i class="fas fa-money-bill-wave text-success"></i> Rent Payment History</h5>
+          </div>
+          <div class="card-body">
+            {% if rent_payments %}
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Due Date</th>
+                      <th>Amount Due</th>
+                      <th>Amount Paid</th>
+                      <th>Status</th>
+                      <th>Payment Method</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for payment in rent_payments %}
+                      <tr>
+                        <td>{{ payment.due_date|date:"M d, Y" }}</td>
+                        <td>KES {{ payment.amount_due|floatformat:0 }}</td>
+                        <td>KES {{ payment.amount_paid|floatformat:0 }}</td>
+                        <td>
+                          {% if payment.status == 'paid' %}
+                            <span class="badge bg-success">Paid</span>
+                          {% elif payment.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                          {% elif payment.status == 'partial' %}
+                            <span class="badge bg-info">Partial</span>
+                          {% else %}
+                            <span class="badge bg-danger">Overdue</span>
+                          {% endif %}
+                        </td>
+                        <td>{{ payment.get_payment_method_display|default:"-" }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <p class="text-muted mb-0">No payment records found</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Quick Actions</h5>
+          </div>
+          <div class="card-body">
+            <a href="{% url 'admin:property_management_tenant_change' tenant.pk %}" class="btn btn-outline-success w-100 mb-2">
+              <i class="fas fa-edit"></i> Edit Tenant
+            </a>
+            <a href="{% url 'tenant_list' %}" class="btn btn-outline-secondary w-100">
+              <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block title %}Property Listings in Kenya | {{ site_name }}{% endblock %}
+
+{% block meta_description %}Browse featured property listings on {{ site_name }}. Find homes for sale, rentals, and Airbnb stays across Kenya.{% endblock %}
+
+{% block og_title %}Featured Property Listings | {{ site_name }}{% endblock %}
+
+{% block og_description %}Discover premium real estate listings, rentals, and investment opportunities in Kenya.{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/search.css' %}">
+  <link rel="stylesheet" href="{% static 'css/listings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="listings-page">
+  {% include 'partials/_searchbar.html' %}
+
+  <section class="property-categories">
+    <div class="container">
+      <div class="category-filters">
+        <h4><i class="fas fa-filter"></i> Browse by Property Type</h4>
+        <div class="category-buttons">
+          <a href="{% url 'listings' %}" class="category-btn active">
+            <i class="fas fa-home"></i> All <span class="count">{{ total_count }}</span>
+          </a>
+          <a href="{% url 'search' %}?property_type=sale" class="category-btn category-sale">
+            <i class="fas fa-tag"></i> For Sale <span class="count">{{ sale_count }}</span>
+          </a>
+          <a href="{% url 'search' %}?property_type=rent" class="category-btn category-rent">
+            <i class="fas fa-key"></i> For Rent <span class="count">{{ rent_count }}</span>
+          </a>
+          <a href="{% url 'search' %}?property_type=airbnb" class="category-btn category-airbnb">
+            <i class="fas fa-bed"></i> Airbnb <span class="count">{{ airbnb_count }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="listings-page-hero">
+    <div class="container">
+      <h1>Featured Listings</h1>
+      <p>Discover premium properties — search, filter, and find your next home or investment.</p>
+    </div>
+  </section>
+
+  <div class="container listings-breadcrumb">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}"><i class="fas fa-home"></i> Home</a></li>
+        <li class="breadcrumb-item active">Featured Listings</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="listings-section">
+    <div class="container">
+      <div class="listings-section-header">
+        <h2>Available Properties</h2>
+        {% if listings %}
+          <span class="listings-count">{{ listings.paginator.count }} propert{{ listings.paginator.count|pluralize:"y,ies" }}</span>
+        {% endif %}
+      </div>
+      {% include 'partials/_listings_grid.html' %}
+    </div>
+  </section>
+</div>
+{% endblock %}

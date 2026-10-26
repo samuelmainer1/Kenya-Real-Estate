@@ -1,0 +1,496 @@
+/* Client dashboard (templates/accounts/dashboard.html).
+ *
+ * Brand palette comes from the public site: teal #20866b for accents and navy
+ * #10284e for headings. Everything degrades gracefully without JS.
+ */
+
+.cdash {
+  --cdash-teal: #20866b;
+  --cdash-teal-dark: #186b55;
+  --cdash-navy: #10284e;
+  --cdash-ink: #1f2937;
+  --cdash-muted: #6b7280;
+  --cdash-line: #e5e7eb;
+  --cdash-surface: #ffffff;
+  --cdash-page: #f6f8f9;
+  background: var(--cdash-page);
+  padding: 2.5rem 0 4rem;
+  min-height: 70vh;
+}
+
+.cdash-wrap {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* ---------- Hero ---------- */
+
+.cdash-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.75rem 2rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--cdash-navy) 0%, var(--cdash-teal) 100%);
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(16, 40, 78, 0.16);
+}
+
+.cdash-hero h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.cdash-hero p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.cdash-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.cdash-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.cdash-pill:hover,
+.cdash-pill:focus {
+  background: rgba(255, 255, 255, 0.24);
+  color: #fff;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.cdash-pill-solid {
+  background: #fff;
+  border-color: #fff;
+  color: var(--cdash-teal-dark);
+}
+
+.cdash-pill-solid:hover,
+.cdash-pill-solid:focus {
+  background: #f0fdf8;
+  color: var(--cdash-teal-dark);
+}
+
+/* ---------- Stats ---------- */
+
+.cdash-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.9rem;
+  margin: 1.25rem 0;
+}
+
+.cdash-stat {
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  background: var(--cdash-surface);
+  border: 1px solid var(--cdash-line);
+  border-left: 4px solid var(--cdash-teal);
+}
+
+.cdash-stat-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cdash-muted);
+}
+
+.cdash-stat-value {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--cdash-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.cdash-stat-amber { border-left-color: #b45309; }
+.cdash-stat-emerald { border-left-color: #047857; }
+.cdash-stat-slate { border-left-color: #475569; }
+
+/* ---------- Next-up banner ---------- */
+
+.cdash-next-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.cdash-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.15rem 1.35rem;
+  border-radius: 12px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.cdash-next-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--cdash-teal);
+  color: #fff;
+  font-size: 1.05rem;
+  flex: 0 0 auto;
+}
+
+.cdash-next-body {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.cdash-next-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cdash-teal-dark);
+}
+
+.cdash-next-title {
+  margin: 0.15rem 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cdash-navy);
+}
+
+.cdash-next-meta {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  color: var(--cdash-muted);
+}
+
+/* ---------- Panels ---------- */
+
+.cdash-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 991px) {
+  .cdash-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.cdash-panel {
+  border-radius: 12px;
+  background: var(--cdash-surface);
+  border: 1px solid var(--cdash-line);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.cdash-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--cdash-line);
+  background: #fbfcfd;
+}
+
+.cdash-panel-head h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cdash-navy);
+}
+
+.cdash-panel-head h2 i {
+  color: var(--cdash-teal);
+}
+
+.cdash-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 11px;
+  background: #e6f5f0;
+  color: var(--cdash-teal-dark);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.cdash-panel-body {
+  padding: 0;
+}
+
+/* ---------- Booking items ---------- */
+
+.cdash-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cdash-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.cdash-item:last-child {
+  border-bottom: none;
+}
+
+.cdash-item-thumb {
+  flex: 0 0 auto;
+  width: 72px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #eef2f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  font-size: 1.1rem;
+}
+
+.cdash-item-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cdash-item-main {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.cdash-item-title {
+  margin: 0 0 0.15rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.cdash-item-title a {
+  color: var(--cdash-navy);
+  text-decoration: none;
+}
+
+.cdash-item-title a:hover,
+.cdash-item-title a:focus {
+  color: var(--cdash-teal);
+  text-decoration: underline;
+}
+
+.cdash-item-meta {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--cdash-muted);
+}
+
+.cdash-item-meta i {
+  width: 14px;
+  color: #9ca3af;
+}
+
+.cdash-item-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+/* ---------- Status badges ---------- */
+
+.cdash-status {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cdash-status-pending { background: #fef3c7; color: #92400e; }
+.cdash-status-confirmed { background: #d1fae5; color: #065f46; }
+.cdash-status-checked_out { background: #e5e7eb; color: #374151; }
+.cdash-status-cancelled { background: #fee2e2; color: #991b1b; }
+
+/* ---------- Buttons inside items ---------- */
+
+.cdash-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid var(--cdash-line);
+  background: #fff;
+  color: var(--cdash-muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.cdash-link-btn:hover,
+.cdash-link-btn:focus {
+  border-color: var(--cdash-teal);
+  color: var(--cdash-teal-dark);
+  background: #f2fbf8;
+  text-decoration: none;
+}
+
+.cdash-link-btn-danger:hover,
+.cdash-link-btn-danger:focus {
+  border-color: #dc2626;
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+/* ---------- Empty state ---------- */
+
+.cdash-empty {
+  padding: 2rem 1.25rem;
+  text-align: center;
+}
+
+.cdash-empty i {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-size: 1.6rem;
+  color: #cbd5e1;
+}
+
+.cdash-empty p {
+  margin: 0 0 0.9rem;
+  font-size: 0.86rem;
+  color: var(--cdash-muted);
+}
+
+.cdash-empty .cdash-pill {
+  border-color: var(--cdash-teal);
+  background: var(--cdash-teal);
+  color: #fff;
+}
+
+.cdash-empty .cdash-pill:hover,
+.cdash-empty .cdash-pill:focus {
+  background: var(--cdash-teal-dark);
+  color: #fff;
+}
+
+/* ---------- Inline table (inquiries / reviews) ---------- */
+
+.cdash-mini {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.cdash-mini th {
+  padding: 0.55rem 1.1rem;
+  border-bottom: 1px solid var(--cdash-line);
+  background: #fbfcfd;
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cdash-muted);
+}
+
+.cdash-mini td {
+  padding: 0.7rem 1.1rem;
+  border-bottom: 1px solid #f1f3f5;
+  vertical-align: top;
+}
+
+.cdash-mini tr:last-child td {
+  border-bottom: none;
+}
+
+.cdash-mini a {
+  color: var(--cdash-navy);
+  text-decoration: none;
+}
+
+.cdash-mini a:hover {
+  color: var(--cdash-teal);
+  text-decoration: underline;
+}
+
+.cdash-stars {
+  color: #f59e0b;
+  white-space: nowrap;
+}
+
+.cdash-muted {
+  color: var(--cdash-muted);
+}
+
+@media (max-width: 575px) {
+  .cdash {
+    padding-top: 1.5rem;
+  }
+
+  .cdash-hero {
+    padding: 1.25rem 1.15rem;
+  }
+
+  .cdash-hero h1 {
+    font-size: 1.3rem;
+  }
+
+  .cdash-item-side {
+    align-items: flex-start;
+    margin-left: 0;
+  }
+}

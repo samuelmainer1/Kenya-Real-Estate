@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Maintenance Schedule - Property Management{% endblock %}
+
+{% block content %}
+<section class="maintenance-section py-5">
+  <div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <h1 class="display-5 mb-2">
+          <i class="fas fa-tools text-success"></i> Maintenance Schedule
+        </h1>
+        <p class="text-muted">Track and manage all property maintenance tasks</p>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <a href="{% url 'admin:property_management_maintenanceschedule_add' %}" class="btn btn-success">
+          <i class="fas fa-plus"></i> Schedule Maintenance
+        </a>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <form method="get" class="row g-3">
+              <div class="col-md-4">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" name="status">
+                  <option value="">All Status</option>
+                  <option value="scheduled" {% if status_filter == 'scheduled' %}selected{% endif %}>Scheduled</option>
+                  <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+                  <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                  <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="priority" class="form-label">Priority</label>
+                <select class="form-select" id="priority" name="priority">
+                  <option value="">All Priorities</option>
+                  <option value="low" {% if priority_filter == 'low' %}selected{% endif %}>Low</option>
+                  <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>Medium</option>
+                  <option value="high" {% if priority_filter == 'high' %}selected{% endif %}>High</option>
+                  <option value="urgent" {% if priority_filter == 'urgent' %}selected{% endif %}>Urgent</option>
+                </select>
+              </div>
+              <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-success w-100">
+                  <i class="fas fa-filter"></i> Filter
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Maintenance Table -->
+    {% if maintenance %}
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Task</th>
+                  <th>Property</th>
+                  <th>Scheduled Date</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Assigned To</th>
+                  <th>Cost</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for task in maintenance %}
+                  <tr>
+                    <td><strong>{{ task.title }}</strong></td>
+                    <td>{{ task.managed_property.listing.title }}</td>
+                    <td>{{ task.scheduled_date|date:"M d, Y" }}</td>
+                    <td>
+                      {% if task.priority == 'urgent' %}
+                        <span class="badge bg-danger">Urgent</span>
+                      {% elif task.priority == 'high' %}
+                        <span class="badge bg-warning text-dark">High</span>
+                      {% elif task.priority == 'medium' %}
+                        <span class="badge bg-info">Medium</span>
+                      {% else %}
+                        <span class="badge bg-secondary">Low</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if task.status == 'completed' %}
+                        <span class="badge bg-success">Completed</span>
+                      {% elif task.status == 'in_progress' %}
+                        <span class="badge bg-info">In Progress</span>
+                      {% elif task.status == 'scheduled' %}
+                        <span class="badge bg-warning text-dark">Scheduled</span>
+                      {% else %}
+                        <span class="badge bg-secondary">Cancelled</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ task.assigned_to.get_full_name|default:"-" }}</td>
+                    <td>{% if task.cost %}KES {{ task.cost|floatformat:0 }}{% else %}-{% endif %}</td>
+                    <td>
+                      <a href="{% url 'admin:property_management_maintenanceschedule_change' task.pk %}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="alert alert-info text-center py-5">
+        <i class="fas fa-info-circle fa-2x mb-3"></i>
+        <h5>No Maintenance Tasks Found</h5>
+        <p class="mb-0">There are currently no maintenance tasks matching your filters.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+

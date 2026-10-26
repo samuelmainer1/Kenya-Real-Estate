@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ managed_property.listing.title }} - Property Management{% endblock %}
+
+{% block content %}
+<section class="property-detail-section py-5">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'property_management' %}">Property Management</a></li>
+        <li class="breadcrumb-item active">{{ managed_property.listing.title }}</li>
+      </ol>
+    </nav>
+
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Property Images -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-0">
+            <img src="{{ managed_property.listing.photo_main.url }}" class="img-fluid w-100" alt="{{ managed_property.listing.title }}" style="max-height: 500px; object-fit: cover;">
+          </div>
+        </div>
+
+        <!-- Property Title and Status -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h1 class="mb-2">{{ managed_property.listing.title }}</h1>
+                <p class="text-muted mb-0">
+                  <i class="fas fa-map-marker-alt text-success"></i>
+                  {{ managed_property.listing.address }}, {{ managed_property.listing.city }}, {{ managed_property.listing.state }}
+                </p>
+              </div>
+              <div class="text-end">
+                <h3 class="text-success mb-2">KES {{ managed_property.listing.price|floatformat:0 }}</h3>
+                <span class="badge bg-success">{{ managed_property.get_management_status_display }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Property Details -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0"><i class="fas fa-home text-success"></i> Property Details</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <strong>Bedrooms:</strong> {{ managed_property.listing.bedrooms }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Bathrooms:</strong> {{ managed_property.listing.bathrooms }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Square Feet:</strong> {{ managed_property.listing.sqft }} sqft
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Garage:</strong> {{ managed_property.listing.garage }} spaces
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Property Type:</strong> {{ managed_property.listing.get_property_type_display }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Lot Size:</strong> {{ managed_property.listing.lot_size }} acres
+              </div>
+            </div>
+            {% if managed_property.listing.description %}
+              <hr>
+              <h6>Description</h6>
+              <p>{{ managed_property.listing.description }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Management Information -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0"><i class="fas fa-clipboard-list text-success"></i> Management Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <strong>Management Status:</strong>
+                <span class="badge bg-success">{{ managed_property.get_management_status_display }}</span>
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Occupancy Status:</strong>
+                {% if managed_property.occupancy_status == 'occupied' %}
+                  <span class="badge bg-info">Occupied</span>
+                {% elif managed_property.occupancy_status == 'vacant' %}
+                  <span class="badge bg-secondary">Vacant</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">Under Maintenance</span>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Management Start Date:</strong> {{ managed_property.management_start_date|date:"M d, Y" }}
+              </div>
+              {% if managed_property.management_end_date %}
+                <div class="col-md-6 mb-3">
+                  <strong>Management End Date:</strong> {{ managed_property.management_end_date|date:"M d, Y" }}
+                </div>
+              {% endif %}
+              <div class="col-md-6 mb-3">
+                <strong>Last Inspection:</strong>
+                {% if managed_property.last_inspection_date %}
+                  {{ managed_property.last_inspection_date|date:"M d, Y" }}
+                {% else %}
+                  <span class="text-muted">Not yet inspected</span>
+                {% endif %}
+              </div>
+              {% if managed_property.next_inspection_date %}
+                <div class="col-md-6 mb-3">
+                  <strong>Next Inspection:</strong> {{ managed_property.next_inspection_date|date:"M d, Y" }}
+                </div>
+              {% endif %}
+            </div>
+
+            {% if managed_property.management_notes %}
+              <hr>
+              <h6>Management Notes</h6>
+              <p class="text-muted">{{ managed_property.management_notes }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Maintenance Information -->
+        {% if managed_property.maintenance_required or managed_property.maintenance_notes %}
+          <div class="card border-0 shadow-sm border-warning mb-4">
+            <div class="card-header bg-warning bg-opacity-10 border-warning">
+              <h5 class="mb-0 text-warning"><i class="fas fa-exclamation-triangle"></i> Maintenance Information</h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <strong>Maintenance Required:</strong>
+                {% if managed_property.maintenance_required %}
+                  <span class="badge bg-warning text-dark">Yes</span>
+                {% else %}
+                  <span class="badge bg-success">No</span>
+                {% endif %}
+              </div>
+              {% if managed_property.maintenance_notes %}
+                <div>
+                  <strong>Maintenance Notes:</strong>
+                  <p class="text-muted">{{ managed_property.maintenance_notes }}</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Realtor Information -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0"><i class="fas fa-user-tie text-success"></i> Realtor Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              {% if managed_property.listing.realtor.photo %}
+                <img src="{{ managed_property.listing.realtor.photo.url }}" class="rounded-circle me-3" alt="{{ managed_property.listing.realtor.name }}" style="width: 80px; height: 80px; object-fit: cover;">
+              {% endif %}
+              <div>
+                <h6 class="mb-1">{{ managed_property.listing.realtor.name }}</h6>
+                <p class="text-muted mb-1">
+                  <i class="fas fa-phone"></i> {{ managed_property.listing.realtor.phone }}
+                </p>
+                <p class="text-muted mb-0">
+                  <i class="fas fa-envelope"></i> {{ managed_property.listing.realtor.email }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Quick Info Card -->
+        <div class="card border-0 shadow-sm mb-4 sticky-top" style="top: 20px;">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Quick Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <small class="text-muted d-block">Management Status</small>
+              <strong>{{ managed_property.get_management_status_display }}</strong>
+            </div>
+            <div class="mb-3">
+              <small class="text-muted d-block">Occupancy</small>
+              <strong>{{ managed_property.get_occupancy_status_display }}</strong>
+            </div>
+            <div class="mb-3">
+              <small class="text-muted d-block">Maintenance Required</small>
+              <strong>{% if managed_property.maintenance_required %}Yes{% else %}No{% endif %}</strong>
+            </div>
+            <hr>
+            <a href="{% url 'property_management' %}" class="btn btn-outline-success w-100">
+              <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #20866b 0%, #0f4033 100%); color: white; padding: 20px; border-radius: 5px 5px 0 0; }
+        .content { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 0 0 5px 5px; }
+        .task-details { background: white; padding: 15px; margin: 15px 0; border-left: 4px solid #20866b; }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+        .btn { display: inline-block; padding: 10px 20px; background: #20866b; color: white; text-decoration: none; border-radius: 5px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>New Maintenance Task Assigned</h2>
+        </div>
+        <div class="content">
+            <p>Hello {{ assigned_to }},</p>
+            
+            <p>A new maintenance task has been assigned to you:</p>
+            
+            <div class="task-details">
+                <h3>{{ maintenance.title }}</h3>
+                <p><strong>Property:</strong> {{ property }}</p>
+                <p><strong>Description:</strong> {{ maintenance.description }}</p>
+                <p><strong>Priority:</strong> <span style="color: {% if maintenance.priority == 'urgent' %}#dc3545{% elif maintenance.priority == 'high' %}#fd7e14{% else %}#0dcaf0{% endif %};">{{ maintenance.get_priority_display }}</span></p>
+                <p><strong>Scheduled Date:</strong> {{ maintenance.scheduled_date|date:"F d, Y" }}</p>
+                {% if maintenance.scheduled_time %}
+                    <p><strong>Scheduled Time:</strong> {{ maintenance.scheduled_time|time:"H:i" }}</p>
+                {% endif %}
+                {% if maintenance.estimated_duration %}
+                    <p><strong>Estimated Duration:</strong> {{ maintenance.estimated_duration }}</p>
+                {% endif %}
+            </div>
+            
+            <p>Please ensure this maintenance is completed by the scheduled date. If you have any questions or need to reschedule, please contact the property manager.</p>
+            
+            <a href="#" class="btn">View Task Details</a>
+            
+            <div class="footer">
+                <p>This is an automated email from {{ site_name }} Property Management System.</p>
+                <p>&copy; 2025 {{ site_name }}. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

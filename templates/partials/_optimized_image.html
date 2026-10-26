@@ -1,0 +1,16 @@
+<!-- Optimized image component with lazy loading -->
+<picture class="optimized-image">
+  {% if webp_src %}
+    <source srcset="{{ webp_src }}" type="image/webp">
+  {% endif %}
+  <img 
+    src="{% if placeholder %}{{ placeholder }}{% else %}data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 {{ width|default:400 }} {{ height|default:300 }}'%3E%3Crect width='100%25' height='100%25' fill='%23f8f9fa'/%3E%3C/svg%3E{% endif %}"
+    data-src="{{ src }}"
+    alt="{{ alt }}"
+    class="lazy-image {{ css_class }}"
+    width="{{ width|default:400 }}"
+    height="{{ height|default:300 }}"
+    loading="lazy"
+    decoding="async"
+  >
+</picture>

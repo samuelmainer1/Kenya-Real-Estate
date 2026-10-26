@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Our Services | {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/services.css' %}">
+{% endblock %}
+
+{% block meta_description %}Discover our comprehensive real estate services at {{ site_name }}. From property sales to investment advisory, we provide expert solutions for all your real estate needs in Kenya.{% endblock %}
+
+{% block meta_keywords %}real estate services, property management, investment advisory, property sales, rentals, Kenya real estate{% endblock %}
+
+{% block og_title %}Our Services | {{ site_name }}{% endblock %}
+
+{% block og_description %}Discover our comprehensive real estate services at {{ site_name }}. From property sales to investment advisory, we provide expert solutions for all your real estate needs in Kenya.{% endblock %}
+
+{% block content %}
+<!-- Services Hero -->
+<section class="services-hero">
+  <div class="services-hero-overlay"></div>
+  <div class="container">
+    <div class="services-hero-content">
+      <h1 class="services-hero-title">Our Premium Services</h1>
+      <p class="services-hero-subtitle">
+        Comprehensive real estate solutions tailored to your needs. 
+        From buying and selling to investment advisory, we've got you covered.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Services -->
+{% if featured_services %}
+<section class="featured-services-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Featured Services</h2>
+      <p class="section-subtitle">Our most popular and comprehensive real estate solutions</p>
+    </div>
+    
+    <div class="featured-services-grid">
+      {% for service in featured_services %}
+      <div class="featured-service-card">
+        <div class="service-card-image">
+          {% if service.image %}
+            <img src="{{ service.image.url }}" alt="{{ service.title }}">
+          {% else %}
+            <div class="service-card-icon">
+              <i class="{{ service.icon_class }}"></i>
+            </div>
+          {% endif %}
+        </div>
+        <div class="service-card-content">
+          <h3 class="service-card-title">{{ service.title }}</h3>
+          <p class="service-card-description">{{ service.short_description }}</p>
+          <a href="{{ service.get_absolute_url }}" class="service-card-btn">
+            Learn More <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- All Services -->
+<section class="all-services-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">All Our Services</h2>
+      <p class="section-subtitle">Complete range of real estate solutions for every need</p>
+    </div>
+    
+    {% if services %}
+    <div class="services-grid">
+      {% for service in services %}
+      <div class="service-card">
+        <div class="service-card-header">
+          <div class="service-icon">
+            <i class="{{ service.icon_class }}"></i>
+          </div>
+          <h3 class="service-title">{{ service.title }}</h3>
+        </div>
+        <p class="service-description">{{ service.short_description }}</p>
+        <a href="{{ service.get_absolute_url }}" class="service-link">
+          Learn More <i class="fas fa-chevron-right"></i>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if services.has_other_pages %}
+    <nav class="services-pagination">
+      <ul class="pagination">
+        {% if services.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ services.previous_page_number }}">
+            <i class="fas fa-chevron-left"></i> Previous
+          </a>
+        </li>
+        {% endif %}
+        
+        {% for num in services.paginator.page_range %}
+        {% if services.number == num %}
+        <li class="page-item active">
+          <span class="page-link">{{ num }}</span>
+        </li>
+        {% else %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        
+        {% if services.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ services.next_page_number }}">
+            Next <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <div class="no-services">
+      <i class="fas fa-info-circle"></i>
+      <h3>No Services Available</h3>
+      <p>We're currently updating our services. Please check back soon!</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="services-cta-section">
+  <div class="container">
+    <div class="services-cta-content">
+      <h2 class="cta-title">Ready to Get Started?</h2>
+      <p class="cta-description">
+        Contact our expert team today and let us help you achieve your real estate goals.
+      </p>
+      <div class="cta-buttons">
+        <a href="{% url 'contact' %}" class="cta-btn cta-btn-primary">
+          <i class="fas fa-phone"></i> Contact Us
+        </a>
+        <a href="{% url 'listings' %}" class="cta-btn cta-btn-secondary">
+          <i class="fas fa-home"></i> View Properties
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

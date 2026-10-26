@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us | {{ site_name }}{% endblock %}
+{% block meta_description %}Get in touch with {{ site_name }}. Call, WhatsApp or email our verified agents about buying, renting, selling or property management across Kenya. We reply within 24 hours.{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- ============ HERO ============ -->
+<section class="ct-hero">
+  <div class="container ct-hero-inner">
+    <span class="ct-eyebrow"><i class="fas fa-comments"></i> We're here to help</span>
+    <h1 class="ct-hero-title">Let's talk about<br><span>your next property</span></h1>
+    <p class="ct-hero-sub">
+      Whether you're buying, renting, selling or handing over the keys for professional
+      management — a real, verified human will get back to you within 24 hours.
+    </p>
+    <div class="ct-hero-badges">
+      <span class="ct-badge"><i class="fas fa-clock"></i> Replies within 24 hours</span>
+      <span class="ct-badge"><i class="fas fa-user-shield"></i> Verified, vetted agents</span>
+      <span class="ct-badge"><i class="fas fa-map-marked-alt"></i> Serving all of Kenya</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUICK CHANNELS ============ -->
+<section class="ct-channels">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-lg-3">
+        <a class="ct-channel-card" href="tel:+254722359298">
+          <span class="ct-channel-icon is-call"><i class="fas fa-phone-alt"></i></span>
+          <h3>Call us</h3>
+          <p>+254 722 359 298</p>
+          <span class="ct-channel-cta">Tap to call <i class="fas fa-arrow-right"></i></span>
+        </a>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <a class="ct-channel-card" href="https://wa.me/254722359298?text=Hi%2C%20I%27d%20like%20to%20talk%20about%20property" target="_blank" rel="noopener">
+          <span class="ct-channel-icon is-wa"><i class="fab fa-whatsapp"></i></span>
+          <h3>WhatsApp</h3>
+          <p>Fastest response — usually minutes</p>
+          <span class="ct-channel-cta">Start chat <i class="fas fa-arrow-right"></i></span>
+        </a>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <a class="ct-channel-card" href="mailto:samuelmainer@gmail.com">
+          <span class="ct-channel-icon is-mail"><i class="fas fa-envelope-open-text"></i></span>
+          <h3>Email us</h3>
+          <p>samuelmainer@gmail.com</p>
+          <span class="ct-channel-cta">Send email <i class="fas fa-arrow-right"></i></span>
+        </a>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <a class="ct-channel-card" href="#ct-map">
+          <span class="ct-channel-icon is-office"><i class="fas fa-building"></i></span>
+          <h3>Visit us</h3>
+          <p>Nextgen Mall, Mombasa Road, Nairobi</p>
+          <span class="ct-channel-cta">Get directions <i class="fas fa-arrow-right"></i></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ============ FORM + OFFICE ============ -->
+<section class="ct-shell">
+  <div class="container">
+
+    <!-- Flash messages (success / error from the view) -->
+    {% if messages %}
+    <div class="ct-alerts">
+      {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row ct-grid">
+      <!-- ============ FORM CARD ============ -->
+      <div class="col-lg-7">
+        <div class="ct-card ct-form-card">
+          <span class="ct-form-kicker"><i class="fas fa-paper-plane"></i> Send us a message</span>
+          <h2 class="ct-form-title">Tell us what you need</h2>
+          <p class="ct-form-sub">Fill in the form and the right person on our team will get back to you within 24 hours.</p>
+
+          <form method="POST" action="" class="ct-form" id="ct-form">
+            {% csrf_token %}
+
+            <!-- Honeypot — hidden from humans -->
+            <div class="ct-hp" aria-hidden="true">
+              <label for="website">Leave this field empty</label>
+              <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="ct-field">
+                  <i class="fas fa-tag"></i>
+                  <select name="inquiry_type" id="inquiry_type">
+                    <option value="" selected>What's this about?</option>
+                    {% for value, label in inquiry_types %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                  <label for="inquiry_type">Inquiry type</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="ct-field">
+                  <i class="fas fa-user-tie"></i>
+                  <select name="realtor_email" id="realtorSelect">
+                    <option value="" selected>Anyone on our team</option>
+                    {% for realtor in realtors %}
+                    <option value="{{ realtor.email }}">{{ realtor.name }}</option>
+                    {% endfor %}
+                  </select>
+                  <label for="realtorSelect">Reach out to</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="ct-field">
+                  <i class="fas fa-user"></i>
+                  <input type="text" name="name" id="name" placeholder=" " required value="{{ form_data.name|default:default_name }}" />
+                  <label for="name">Your Name</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="ct-field">
+                  <i class="fas fa-envelope"></i>
+                  <input type="email" name="email" id="email" placeholder=" " required value="{{ form_data.email|default:default_email }}" />
+                  <label for="email">Email Address</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="ct-field">
+              <i class="fas fa-phone"></i>
+              <input type="tel" name="phone" id="phone" placeholder=" " required value="{{ form_data.phone|default:'' }}" />
+              <label for="phone">Phone / WhatsApp Number</label>
+            </div>
+
+            <div class="ct-field">
+              <i class="fas fa-comment-dots"></i>
+              <textarea name="message" id="message" placeholder=" " required>{{ form_data.message|default:'' }}</textarea>
+              <label for="message">Your Message</label>
+            </div>
+
+            <button type="submit" class="ct-btn-submit">
+              <i class="fas fa-paper-plane"></i> Send Message
+            </button>
+            <p class="ct-privacy"><i class="fas fa-lock"></i> Your details are only used to respond to your inquiry. See our <a href="{% url 'privacy_policy' %}">privacy policy</a>.</p>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============ OFFICE / MAP COLUMN ============ -->
+      <div class="col-lg-5">
+        <div class="ct-info-stack">
+          <div class="ct-card ct-office-card">
+            <h3><i class="fas fa-map-marker-alt"></i> Head Office</h3>
+            <p class="ct-office-address">Nextgen Mall, Mombasa Road<br>Nairobi, Kenya</p>
+            <table class="ct-hours">
+              <tr><td><i class="fas fa-calendar-day"></i> Mon &ndash; Fri</td><td>8:00 AM &ndash; 5:00 PM</td></tr>
+              <tr><td><i class="fas fa-calendar-alt"></i> Saturday</td><td>9:00 AM &ndash; 2:00 PM</td></tr>
+              <tr><td><i class="fas fa-calendar-times"></i> Sunday</td><td>Closed (WhatsApp monitored)</td></tr>
+            </table>
+            <div class="ct-office-socials">
+              <a href="https://wa.me/254722359298" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+              <a href="#" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+              <a href="#" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+          </div>
+          <div class="ct-card ct-map-card" id="ct-map">
+            <iframe
+              src="https://maps.google.com/maps?q=Nextgen%20Mall%2C%20Mombasa%20Road%2C%20Nairobi%2C%20Kenya&z=15&output=embed"
+              width="100%" height="260" style="border:0; border-radius: 1rem;" allowfullscreen=""
+              loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+              title="{{ site_name }} head office location map"></iframe>
+            <p class="ct-map-note"><i class="fas fa-directions"></i> Nextgen Mall, Mombasa Road &mdash; secure visitor parking available.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ============ TEAM ============ -->
+{% if realtors %}
+<section class="ct-team-section">
+  <div class="container">
+    <div class="ct-section-head">
+      <h2>Talk to our team</h2>
+      <p>Pick a verified agent to enquire with directly — or use the form and we'll route it for you.</p>
+    </div>
+    <div class="row justify-content-center">
+      {% for realtor in realtors %}
+      <div class="col-sm-6 col-lg-3">
+        <div class="ct-team-card">
+          <span class="ct-mvp">{% if realtor.is_mvp %}<i class="fas fa-award"></i> Team lead{% else %}<i class="fas fa-check-circle"></i> Verified{% endif %}</span>
+          <img class="ct-avatar" src="{{ realtor.photo.url }}" alt="{{ realtor.name }} — {{ site_name }} agent" loading="lazy">
+          <h3>{{ realtor.name }}</h3>
+          <div class="ct-team-links">
+            <a href="tel:{{ realtor.phone|cut:' ' }}" title="Call {{ realtor.name }}"><i class="fas fa-phone-alt"></i></a>
+            <a href="https://wa.me/{{ realtor.phone|cut:' '|cut:'+'|cut:'-' }}" target="_blank" rel="noopener" title="WhatsApp {{ realtor.name }}"><i class="fab fa-whatsapp"></i></a>
+            <a href="mailto:{{ realtor.email }}" title="Email {{ realtor.name }}"><i class="fas fa-envelope"></i></a>
+          </div>
+          <button type="button" class="ct-pick-btn" data-email="{{ realtor.email }}">
+            <i class="fas fa-comment"></i> Enquire with {{ realtor.name|truncatechars:20 }}
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ============ FAQ ============ -->
+<section class="ct-faq-section">
+  <div class="container">
+    <div class="ct-section-head">
+      <h2>Frequently asked questions</h2>
+      <p>Quick answers before you reach out.</p>
+    </div>
+    <div class="accordion ct-faq" id="ctFaq">
+      <div class="ct-faq-card">
+        <button class="ct-faq-btn" data-toggle="collapse" data-target="#faq1" aria-expanded="true">
+          <span><i class="fas fa-calendar-check"></i> How do I schedule a property viewing?</span><i class="fas fa-chevron-down"></i>
+        </button>
+        <div id="faq1" class="collapse show" data-parent="#ctFaq">
+          <div class="ct-faq-body">Call or WhatsApp us, or send the form above with "Buying" or "Renting" selected. An agent confirms a viewing slot within 24 hours — most Nairobi viewings can be arranged for the same or next day.</div>
+        </div>
+      </div>
+      <div class="ct-faq-card">
+        <button class="ct-faq-btn collapsed" data-toggle="collapse" data-target="#faq2" aria-expanded="false">
+          <span><i class="fas fa-wallet"></i> Do you charge for property viewings?</span><i class="fas fa-chevron-down"></i>
+        </button>
+        <div id="faq2" class="collapse" data-parent="#ctFaq">
+          <div class="ct-faq-body">No — viewings within Nairobi are free. For properties outside Nairobi we agree on transport logistics with you first, so there are no surprises.</div>
+        </div>
+      </div>
+      <div class="ct-faq-card">
+        <button class="ct-faq-btn collapsed" data-toggle="collapse" data-target="#faq3" aria-expanded="false">
+          <span><i class="fas fa-building"></i> What does property management cost?</span><i class="fas fa-chevron-down"></i>
+        </button>
+        <div id="faq3" class="collapse" data-parent="#ctFaq">
+          <div class="ct-faq-body">Management is priced on your portfolio — typically a small percentage of collected rent covering tenant sourcing, rent collection, inspections and maintenance. Select "Property management" in the form and we'll send a tailored quote.</div>
+        </div>
+      </div>
+      <div class="ct-faq-card">
+        <button class="ct-faq-btn collapsed" data-toggle="collapse" data-target="#faq4" aria-expanded="false">
+          <span><i class="fas fa-key"></i> Can you list and market my property?</span><i class="fas fa-chevron-down"></i>
+        </button>
+        <div id="faq4" class="collapse" data-parent="#ctFaq">
+          <div class="ct-faq-body">Yes. We handle professional photography, listing on our site and portals, and viewings. Select "Selling or listing my property" above to get started.</div>
+        </div>
+      </div>
+      <div class="ct-faq-card">
+        <button class="ct-faq-btn collapsed" data-toggle="collapse" data-target="#faq5" aria-expanded="false">
+          <span><i class="fas fa-bolt"></i> How fast will I get a response?</span><i class="fas fa-chevron-down"></i>
+        </button>
+        <div id="faq5" class="collapse" data-parent="#ctFaq">
+          <div class="ct-faq-body">Every inquiry is answered within 24 hours — WhatsApp is usually faster, often within minutes during office hours.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Floating labels for <select> fields: flag them filled once a value is chosen
+  document.querySelectorAll('.ct-field select').forEach(function (sel) {
+    var sync = function () { sel.classList.toggle('filled', !!sel.value); };
+    sel.addEventListener('change', sync);
+    sync();
+  });
+
+  // "Enquire with <agent>" buttons pre-select that agent in the form
+  document.querySelectorAll('.ct-pick-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var select = document.getElementById('realtorSelect');
+      if (select) {
+        select.value = btn.getAttribute('data-email');
+        select.classList.add('filled');
+      }
+      var form = document.getElementById('ct-form');
+      if (form) form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+  // Office "Visit us" channel card scrolls to the map (smooth)
+  document.querySelectorAll('a[href="#ct-map"]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      var target = document.getElementById('ct-map');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+});
+</script>
+{% endblock %}
+
+ 

@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page.meta_title }}{% endblock %}
+
+{% block meta_description %}{{ page.meta_description }}{% endblock %}
+
+{% block meta_keywords %}{% if page.meta_keywords %}{{ page.meta_keywords }}{% else %}{{ site_keywords }}{% endif %}{% endblock %}
+
+{% block robots %}index, follow{% endblock %}
+
+{% block og_title %}{{ page.meta_title }}{% endblock %}
+
+{% block og_description %}{{ page.meta_description }}{% endblock %}
+
+{% block og_type %}article{% endblock %}
+
+{% block og_url %}{{ canonical_url }}{% endblock %}
+
+{% block twitter_card %}summary{% endblock %}
+
+{% block twitter_title %}{{ page.meta_title }}{% endblock %}
+
+{% block twitter_description %}{{ page.meta_description }}{% endblock %}
+
+{% block meta %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "{{ page.title|escapejs }}",
+  "description": "{{ page.meta_description|escapejs }}",
+  "url": "{{ canonical_url }}",
+  "dateModified": "{{ page.last_updated|date:'c' }}",
+  "datePublished": "{{ page.effective_date|date:'c' }}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ site_name|escapejs }}",
+    "url": "{{ site_url }}"
+  }
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/legal.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Legal Page Hero -->
+<section class="legal-hero">
+  <div class="container">
+    <div class="legal-breadcrumb">
+      <a href="{% url 'index' %}">Home</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>{{ page.title }}</span>
+    </div>
+    <h1 class="legal-title">{{ page.title }}</h1>
+    <div class="legal-meta">
+      <div class="legal-meta-item">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Effective Date: {{ page.effective_date|date:"F d, Y" }}</span>
+      </div>
+      <div class="legal-meta-item">
+        <i class="fas fa-clock"></i>
+        <span>Last Updated: {{ page.last_updated|date:"F d, Y" }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Legal Content -->
+<section class="legal-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="legal-document">
+          <div class="legal-text">
+            {{ page.content|linebreaks }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4">
+        <div class="legal-sidebar">
+          <!-- Contact Card -->
+          <div class="legal-contact-card">
+            <h4>Questions?</h4>
+            <p>If you have any questions about this {{ page.get_page_type_display|lower }}, please contact us.</p>
+            <div class="contact-methods">
+              <a href="mailto:samuelmainer@gmail.com" class="contact-method">
+                <i class="fas fa-envelope"></i>
+                <span>Email Us</span>
+              </a>
+              <a href="tel:+254722359298" class="contact-method">
+                <i class="fas fa-phone"></i>
+                <span>Call Us</span>
+              </a>
+              <a href="{% url 'contact' %}" class="contact-method">
+                <i class="fas fa-comments"></i>
+                <span>Contact Form</span>
+              </a>
+            </div>
+          </div>
+          
+          <!-- Other Legal Pages -->
+          <div class="other-legal-pages">
+            <h4>Other Legal Documents</h4>
+            <div class="legal-links">
+              {% if page.page_type != 'privacy' %}
+              <a href="{% url 'privacy_policy' %}" class="legal-link">
+                <i class="fas fa-shield-alt"></i>
+                <span>Privacy Policy</span>
+              </a>
+              {% endif %}
+              {% if page.page_type != 'terms' %}
+              <a href="{% url 'terms_of_service' %}" class="legal-link">
+                <i class="fas fa-file-contract"></i>
+                <span>Terms of Service</span>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

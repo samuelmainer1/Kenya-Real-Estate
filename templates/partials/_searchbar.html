@@ -1,0 +1,79 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/searchbar.css' %}">
+
+<div class="vincent-searchbar">
+  <div class="search-header">
+    <h2 class="search-title">Find Your Dream Property</h2>
+    <p class="search-subtitle">Search by location, features, or price range</p>
+  </div>
+  
+  <form action="{% url 'search' %}" method="get">
+    <div class="form-row">
+      <div class="form-col form-col-search">
+        <label class="form-label" for="keywords">
+          <i class="fas fa-search"></i> Keywords
+        </label>
+        <div class="form-group">
+          <input type="text" id="keywords" name="keywords" class="form-control" 
+                 placeholder="Pool, Garage, Penthouse, Garden..." 
+                 value="{{ request.GET.keywords }}">
+          <i class="fas fa-search input-icon"></i>
+        </div>
+      </div>
+      
+      <div class="form-col">
+        <label class="form-label" for="city">
+          <i class="fas fa-map-marker-alt"></i> Location
+        </label>
+        <div class="form-group">
+          <input type="text" id="city" name="city" class="form-control" 
+                 placeholder="Nairobi, Mombasa, London..." 
+                 value="{{ request.GET.city }}">
+          <i class="fas fa-map-marker-alt input-icon"></i>
+        </div>
+      </div>
+      
+      <div class="form-col">
+        <label class="form-label" for="bedrooms">
+          <i class="fas fa-bed"></i> Bedrooms
+        </label>
+        <div class="form-group">
+          <select id="bedrooms" name="bedrooms" class="form-select">
+            <option value="">Any Bedrooms</option>
+            {% for key, value in bedroom_choices.items %}
+            <option value="{{ key }}" {% if request.GET.bedrooms == key|stringformat:'s' %}selected{% endif %}>
+              {{ value }}
+            </option>
+            {% endfor %}
+          </select>
+          <i class="fas fa-bed input-icon"></i>
+        </div>
+      </div>
+      
+      <div class="form-col form-col-price">
+        <label class="form-label" for="price">
+          <i class="fas fa-money-bill-wave"></i> Max Price
+        </label>
+        <div class="form-group">
+          <select id="price" name="price" class="form-select">
+            <option value="">Any Price</option>
+            {% for key, value in price_choices.items %}
+            <option value="{{ key }}" {% if request.GET.price == key|stringformat:'s' %}selected{% endif %}>
+              Ksh {{ value }}
+            </option>
+            {% endfor %}
+          </select>
+          <i class="fas fa-money-bill-wave input-icon"></i>
+        </div>
+      </div>
+      
+      <div class="form-col form-col-btn">
+        <label class="form-label">&nbsp;</label>
+        <button class="btn" type="submit">
+          <i class="fas fa-search"></i>
+          Search Properties
+        </button>
+      </div>
+    </div>
+  </form>
+</div> 

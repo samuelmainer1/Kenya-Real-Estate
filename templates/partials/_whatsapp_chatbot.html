@@ -1,0 +1,185 @@
+{% load static %}
+<!-- WhatsApp Chatbot Widget -->
+<div id="whatsapp-chatbot-widget" class="whatsapp-chatbot-widget" style="display: none;">
+  <!-- Header -->
+  <div class="whatsapp-chatbot-header">
+    <div class="chatbot-controls">
+      <button class="minimize-btn" id="minimize-chatbot" title="Minimize">−</button>
+      <button class="close-btn" id="close-chatbot" title="Close">×</button>
+    </div>
+    
+    <div class="header-content">
+      <div class="whatsapp-icon">
+        <i class="fab fa-whatsapp"></i>
+      </div>
+      <div class="header-text">
+        <div class="brand">{{ site_name }} Support</div>
+        <div class="status-text">
+          <span class="online-dot"></span>
+          Typically replies instantly
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message -->
+  <div class="whatsapp-chatbot-widget-message">
+    <div class="message-bubble">
+      <div class="message-avatar">
+        <i class="fas fa-user-tie" style="color: #fff; font-size: 16px;"></i>
+      </div>
+      <div class="message-content">
+        <div class="message-text">
+          Hi there! 👋 I'm here to help you with any questions about our properties. How can I assist you today?
+        </div>
+        <div class="message-time" id="current-time"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="whatsapp-chatbot-actions">
+    <a href="https://wa.me/254722359298?text=Hi%2C%20I%27m%20interested%20in%20your%20properties" 
+       class="whatsapp-chatbot-widget-btn" 
+       target="_blank" 
+       rel="noopener">
+      <i class="fab fa-whatsapp"></i>
+      Start Conversation
+    </a>
+    
+    <div class="quick-actions">
+      <a href="https://wa.me/254722359298?text=I%27m%20looking%20for%20properties%20for%20sale" 
+         class="quick-action-btn" 
+         target="_blank" 
+         rel="noopener">
+        <i class="fas fa-home"></i>
+        <span>Properties for Sale</span>
+      </a>
+      
+      <a href="https://wa.me/254722359298?text=I%27m%20looking%20for%20rental%20properties" 
+         class="quick-action-btn" 
+         target="_blank" 
+         rel="noopener">
+        <i class="fas fa-key"></i>
+        <span>Rental Properties</span>
+      </a>
+      
+      <a href="https://wa.me/254722359298?text=I%27m%20interested%20in%20Airbnb%20properties" 
+         class="quick-action-btn" 
+         target="_blank" 
+         rel="noopener">
+        <i class="fas fa-bed"></i>
+        <span>Airbnb Properties</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Reopen Button -->
+<button id="whatsapp-chatbot-btn-reopen" class="whatsapp-chatbot-btn-reopen">
+  <i class="fab fa-whatsapp"></i>
+  <div class="pulse-dot"></div>
+</button>
+
+<!-- WhatsApp Chatbot Styles -->
+<link rel="stylesheet" href="{% static 'css/whatsapp-chatbot.css' %}">
+
+<!-- Inline CSS to force positioning -->
+<style>
+#whatsapp-chatbot-btn-reopen {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 99999 !important;
+  transform: none !important;
+  margin: 0 !important;
+  top: auto !important;
+  left: auto !important;
+}
+
+#whatsapp-chatbot-widget {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 99998 !important;
+  transform: none !important;
+  margin: 0 !important;
+  top: auto !important;
+  left: auto !important;
+}
+</style>
+
+<!-- WhatsApp Chatbot Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const widget = document.getElementById('whatsapp-chatbot-widget');
+  const reopenBtn = document.getElementById('whatsapp-chatbot-btn-reopen');
+  const closeBtn = document.getElementById('close-chatbot');
+  const minimizeBtn = document.getElementById('minimize-chatbot');
+  const timeElement = document.getElementById('current-time');
+
+  // Set current time
+  if (timeElement) {
+    const now = new Date();
+    timeElement.textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  }
+
+  // Show widget after 3 seconds
+  setTimeout(() => {
+    if (widget && !localStorage.getItem('whatsapp-chatbot-closed')) {
+      widget.style.display = 'flex';
+    } else if (reopenBtn) {
+      reopenBtn.classList.add('show');
+    }
+  }, 3000);
+
+  // Close widget
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      if (widget) {
+        widget.style.display = 'none';
+        localStorage.setItem('whatsapp-chatbot-closed', 'true');
+      }
+      if (reopenBtn) {
+        reopenBtn.classList.add('show');
+      }
+    });
+  }
+
+  // Minimize widget
+  if (minimizeBtn) {
+    minimizeBtn.addEventListener('click', () => {
+      if (widget) {
+        widget.style.display = 'none';
+      }
+      if (reopenBtn) {
+        reopenBtn.classList.add('show');
+      }
+    });
+  }
+
+  // Reopen widget
+  if (reopenBtn) {
+    reopenBtn.addEventListener('click', () => {
+      if (widget) {
+        widget.style.display = 'flex';
+        localStorage.removeItem('whatsapp-chatbot-closed');
+      }
+      reopenBtn.classList.remove('show');
+    });
+  }
+
+  // Track WhatsApp clicks
+  document.querySelectorAll('a[href*="wa.me"]').forEach(link => {
+    link.addEventListener('click', () => {
+      // Track analytics if available
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'whatsapp_click', {
+          event_category: 'engagement',
+          event_label: link.textContent.trim()
+        });
+      }
+    });
+  });
+});
+</script>

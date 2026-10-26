@@ -1,0 +1,30 @@
+{% comment %}
+  Contact and social links come from GlobalSettings (Control Centre → Site
+  settings). Blank fields fall back to the original hard-coded details so the
+  bar never renders empty after a fresh deploy, and links with no URL are
+  omitted rather than pointing at "#".
+{% endcomment %}
+{% with phone=contact_phone|default:"+254 722 359 298" email=contact_email|default:"samuelmainer@gmail.com" %}
+<section id="top-bar" class="topbar" aria-label="Contact and social links">
+  <div class="container topbar-inner">
+    <div class="topbar-contact">
+      <a href="tel:{{ phone|cut:' ' }}" class="topbar-link">
+        <i class="fas fa-phone" aria-hidden="true"></i>
+        <span>{{ phone }}</span>
+      </a>
+      <a href="mailto:{{ email }}" class="topbar-link">
+        <i class="fas fa-envelope" aria-hidden="true"></i>
+        <span>{{ email }}</span>
+      </a>
+    </div>
+    <div class="topbar-social" aria-label="Social media">
+      {% if global_settings.twitter_url %}<a href="{{ global_settings.twitter_url }}" class="topbar-social-link" aria-label="Twitter" target="_blank" rel="noopener"><i class="fab fa-twitter"></i></a>{% endif %}
+      {% if global_settings.facebook_url %}<a href="{{ global_settings.facebook_url }}" class="topbar-social-link" aria-label="Facebook" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>{% endif %}
+      {% if global_settings.linkedin_url %}<a href="{{ global_settings.linkedin_url }}" class="topbar-social-link" aria-label="LinkedIn" target="_blank" rel="noopener"><i class="fab fa-linkedin-in"></i></a>{% endif %}
+      {% if global_settings.instagram_url %}<a href="{{ global_settings.instagram_url }}" class="topbar-social-link" aria-label="Instagram" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>{% endif %}
+      {% if global_settings.youtube_url %}<a href="{{ global_settings.youtube_url }}" class="topbar-social-link" aria-label="YouTube" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>{% endif %}
+      {% if global_settings.whatsapp_number %}<a href="https://wa.me/{{ global_settings.whatsapp_number }}" class="topbar-social-link" aria-label="WhatsApp" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i></a>{% endif %}
+    </div>
+  </div>
+</section>
+{% endwith %}

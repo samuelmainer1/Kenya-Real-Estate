@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #dc3545 0%, #a02622 100%); color: white; padding: 20px; border-radius: 5px 5px 0 0; }
+        .content { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 0 0 5px 5px; }
+        .payment-details { background: #fff3cd; padding: 15px; margin: 15px 0; border-left: 4px solid #dc3545; }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+        .amount { font-size: 24px; color: #dc3545; font-weight: bold; }
+        .warning { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>⚠️ Overdue Rent Payment Notice</h2>
+        </div>
+        <div class="content">
+            <p>Hello {{ tenant.get_full_name }},</p>
+            
+            <p class="warning">Your rent payment is now {{ days_overdue }} day(s) overdue.</p>
+            
+            <div class="payment-details">
+                <p><strong>Property:</strong> {{ property }}</p>
+                <p><strong>Amount Due:</strong> <span class="amount">KES {{ payment.amount_due|floatformat:0 }}</span></p>
+                <p><strong>Due Date:</strong> {{ payment.due_date|date:"F d, Y" }}</p>
+                <p><strong>Days Overdue:</strong> <span class="warning">{{ days_overdue }} days</span></p>
+                {% if payment.amount_paid > 0 %}
+                    <p><strong>Amount Paid:</strong> KES {{ payment.amount_paid|floatformat:0 }}</p>
+                    <p><strong>Outstanding Balance:</strong> KES {{ payment.amount_due|add:payment.amount_paid|floatformat:0 }}</p>
+                {% endif %}
+            </div>
+            
+            <p>Please arrange payment immediately to avoid further action. You can make payment through:</p>
+            <ul>
+                <li>Bank Transfer</li>
+                <li>Mobile Money (M-Pesa)</li>
+                <li>Check</li>
+                <li>Online Payment Portal</li>
+            </ul>
+            
+            <p>If you are experiencing financial difficulties, please contact us to discuss payment arrangements.</p>
+            
+            <p><strong>Contact Information:</strong></p>
+            <p>Email: samuelmainer@gmail.com<br>Phone: +254 722 359 298</p>
+            
+            <div class="footer">
+                <p>This is an automated email from {{ site_name }} Property Management System.</p>
+                <p>&copy; 2025 {{ site_name }}. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

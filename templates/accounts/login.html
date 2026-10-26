@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login | {{ site_name }}{% endblock %}
+{% block meta_description %}Login to your {{ site_name }} account to access your dashboard, saved listings, and bookings.{% endblock %}
+
+{% block content %}
+<style>
+  .login-bg {
+    min-height: 100vh;
+    background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80') no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .login-glass-card {
+    background: rgba(255,255,255,0.85);
+    border-radius: 2.2rem;
+    box-shadow: 0 8px 40px rgba(32,134,107,0.13);
+    padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+    max-width: 400px;
+    width: 100%;
+    margin: 3rem auto;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(10px) saturate(120%);
+    border: 1.5px solid rgba(32,134,107,0.10);
+    animation: fadeInUp 1.2s cubic-bezier(.39,.575,.56,1.000);
+  }
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(40px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .login-glass-card h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #20866b;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  .login-form-group {
+    margin-bottom: 1.3rem;
+    position: relative;
+  }
+  .login-form-group label {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #20866b;
+    font-size: 1.05rem;
+    pointer-events: none;
+    transition: all 0.2s;
+    opacity: 0.7;
+  }
+  .login-form-group input:focus + label,
+  .login-form-group input:not(:placeholder-shown) + label {
+    top: -0.7rem;
+    left: 1rem;
+    font-size: 0.92rem;
+    background: #fff;
+    padding: 0 0.3rem;
+    border-radius: 0.5rem;
+    opacity: 1;
+  }
+  .login-form-group input {
+    width: 100%;
+    border-radius: 2rem;
+    border: 1.5px solid #e4e4e4;
+    padding: 1rem 1.2rem 1rem 2.2rem;
+    font-size: 1.08rem;
+    background: rgba(255,255,255,0.96);
+    box-shadow: 0 2px 8px rgba(32,134,107,0.04);
+    transition: border 0.2s;
+  }
+  .login-form-group input:focus {
+    border: 1.5px solid #20866b;
+    box-shadow: 0 2px 12px rgba(32,134,107,0.10);
+  }
+  .login-btn {
+    width: 100%;
+    font-size: 1.15rem;
+    font-weight: 700;
+    border-radius: 2em;
+    padding: 0.9em 0;
+    background: linear-gradient(90deg, #20866b 0%, #1fc8db 100%);
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 12px rgba(32,134,107,0.10);
+    margin-bottom: 1.2rem;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .login-btn:hover {
+    background: linear-gradient(90deg, #1fc8db 0%, #20866b 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 24px rgba(32,134,107,0.18);
+  }
+  .login-links {
+    text-align: center;
+    margin-top: 1.2rem;
+  }
+  .login-links a {
+    color: #20866b;
+    font-weight: 600;
+    margin: 0 0.7rem;
+    text-decoration: underline;
+    transition: color 0.2s;
+  }
+  .login-links a:hover {
+    color: #1fc8db;
+  }
+</style>
+<div class="login-bg">
+  <div class="login-glass-card">
+    <h2>Welcome Back</h2>
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <div class="login-form-group">
+        <input type="text" name="username" id="id_username" placeholder=" " required>
+        <label for="id_username">Username</label>
+      </div>
+      <div class="login-form-group">
+        <input type="password" name="password" id="id_password" placeholder=" " required>
+        <label for="id_password">Password</label>
+      </div>
+      <button type="submit" class="login-btn">Login</button>
+    </form>
+    <div class="login-links">
+      <a href="{% url 'register' %}">Create an account</a> |
+      <a href="#">Forgot password?</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

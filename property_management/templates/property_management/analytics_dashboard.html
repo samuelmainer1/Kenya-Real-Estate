@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard - Property Management{% endblock %}
+
+{% block content %}
+<section class="analytics-section py-5">
+  <div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <h1 class="display-5 mb-2">
+          <i class="fas fa-chart-line text-success"></i> Analytics Dashboard
+        </h1>
+        <p class="text-muted">Real-time insights and reports for your managed properties</p>
+      </div>
+    </div>
+
+    <!-- Key Metrics Row 1 -->
+    <div class="row mb-4">
+      <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm bg-gradient-primary text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-title mb-1">Total Properties</h6>
+                <h2 class="mb-0">{{ total_properties }}</h2>
+              </div>
+              <i class="fas fa-building fa-3x opacity-50"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm bg-gradient-success text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-title mb-1">Active Properties</h6>
+                <h2 class="mb-0">{{ active_count }}</h2>
+              </div>
+              <i class="fas fa-check-circle fa-3x opacity-50"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm bg-gradient-info text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-title mb-1">Total Tenants</h6>
+                <h2 class="mb-0">{{ total_tenants }}</h2>
+              </div>
+              <i class="fas fa-users fa-3x opacity-50"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm bg-gradient-warning text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-title mb-1">Occupancy Rate</h6>
+                <h2 class="mb-0">{{ occupancy_rate }}%</h2>
+              </div>
+              <i class="fas fa-chart-pie fa-3x opacity-50"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Occupancy Status -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0"><i class="fas fa-home text-success"></i> Property Occupancy Status</h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <h3 class="text-success">{{ occupied_count }}</h3>
+                  <p class="text-muted mb-0">Occupied</p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <h3 class="text-secondary">{{ vacant_count }}</h3>
+                  <p class="text-muted mb-0">Vacant</p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <h3 class="text-warning">{{ under_maintenance_count }}</h3>
+                  <p class="text-muted mb-0">Under Maintenance</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rent Collection -->
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0"><i class="fas fa-money-bill-wave text-success"></i> Rent Collection</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <small class="text-muted d-block">Total Collected</small>
+                <h4 class="text-success">KES {{ total_rent_collected|floatformat:0 }}</h4>
+              </div>
+              <div class="col-md-6 mb-3">
+                <small class="text-muted d-block">Amount Due</small>
+                <h4 class="text-danger">KES {{ total_rent_due|floatformat:0 }}</h4>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted d-block">Monthly Rent</small>
+                <h4 class="text-info">KES {{ total_monthly_rent|floatformat:0 }}</h4>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted d-block">Overdue Payments</small>
+                <h4 class="text-warning">{{ overdue_payments }}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Maintenance Statistics -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0"><i class="fas fa-tools text-success"></i> Maintenance Overview</h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <h3 class="text-info">{{ total_maintenance }}</h3>
+                  <p class="text-muted mb-0">Total Tasks</p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <h3 class="text-success">{{ completed_maintenance }}</h3>
+                  <p class="text-muted mb-0">Completed</p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <h3 class="text-warning">{{ pending_maintenance }}</h3>
+                  <p class="text-muted mb-0">Pending</p>
+                </div>
+              </div>
+            </div>
+            <hr>
+            <div class="alert alert-danger mb-0" role="alert">
+              <i class="fas fa-exclamation-triangle"></i> <strong>{{ overdue_maintenance }}</strong> overdue maintenance tasks
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Maintenance -->
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0"><i class="fas fa-calendar-alt text-success"></i> Upcoming Maintenance (7 Days)</h5>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info mb-0">
+              <h4 class="mb-0">{{ upcoming_maintenance }} tasks scheduled</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Maintenance -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0"><i class="fas fa-history text-success"></i> Recent Maintenance Tasks</h5>
+          </div>
+          <div class="card-body">
+            {% if recent_maintenance %}
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Task</th>
+                      <th>Property</th>
+                      <th>Scheduled Date</th>
+                      <th>Status</th>
+                      <th>Priority</th>
+                      <th>Cost</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for maintenance in recent_maintenance %}
+                      <tr>
+                        <td><strong>{{ maintenance.title }}</strong></td>
+                        <td>{{ maintenance.managed_property.listing.title }}</td>
+                        <td>{{ maintenance.scheduled_date|date:"M d, Y" }}</td>
+                        <td>
+                          {% if maintenance.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                          {% elif maintenance.status == 'in_progress' %}
+                            <span class="badge bg-info">In Progress</span>
+                          {% elif maintenance.status == 'scheduled' %}
+                            <span class="badge bg-warning text-dark">Scheduled</span>
+                          {% else %}
+                            <span class="badge bg-secondary">{{ maintenance.get_status_display }}</span>
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if maintenance.priority == 'urgent' %}
+                            <span class="badge bg-danger">Urgent</span>
+                          {% elif maintenance.priority == 'high' %}
+                            <span class="badge bg-warning text-dark">High</span>
+                          {% elif maintenance.priority == 'medium' %}
+                            <span class="badge bg-info">Medium</span>
+                          {% else %}
+                            <span class="badge bg-secondary">Low</span>
+                          {% endif %}
+                        </td>
+                        <td>{% if maintenance.cost %}KES {{ maintenance.cost|floatformat:0 }}{% else %}-{% endif %}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <p class="text-muted mb-0">No recent maintenance tasks</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overdue Rent Payments -->
+    {% if overdue_rent %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card border-0 shadow-sm border-danger">
+            <div class="card-header bg-danger bg-opacity-10 border-danger">
+              <h5 class="mb-0 text-danger"><i class="fas fa-exclamation-circle"></i> Overdue Rent Payments</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Tenant</th>
+                      <th>Property</th>
+                      <th>Amount Due</th>
+                      <th>Due Date</th>
+                      <th>Days Overdue</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for payment in overdue_rent %}
+                      <tr>
+                        <td><strong>{{ payment.tenant.get_full_name }}</strong></td>
+                        <td>{{ payment.tenant.managed_property.listing.title }}</td>
+                        <td class="text-danger"><strong>KES {{ payment.amount_due|floatformat:0 }}</strong></td>
+                        <td>{{ payment.due_date|date:"M d, Y" }}</td>
+                        <td>
+                          {% with days_overdue=payment.due_date|add:"-0" %}
+                            <span class="badge bg-danger">{{ payment.due_date|timesince }} ago</span>
+                          {% endwith %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  .bg-gradient-success {
+    background: linear-gradient(135deg, #20866b 0%, #0f4033 100%);
+  }
+  .bg-gradient-info {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  }
+  .bg-gradient-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  }
+</style>
+{% endblock %}
+

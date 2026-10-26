@@ -1,0 +1,42 @@
+{% extends 'admin/base.html' %}
+{% load i18n static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Kenya Realestate Admin') }}{% endblock %}
+
+{% comment %}
+  The Control Centre renders its own grouped, permission-aware sidebar in place
+  of Django's flat app list, on every admin page.
+
+  * `nav-sidebar`: `super()` is not called because the stock block only wraps
+    `admin/nav_sidebar.html`, which this replaces. (Note that Django's
+    `admin/index.html` blanks this block - `custom_index.html` re-states it.)
+  * `branding`: emptied on purpose - the sidebar already shows the logo and site
+    name, so repeating them in the top bar only costs vertical space. The top
+    bar keeps the user tools (site link, password, log out, theme toggle).
+{% endcomment %}
+{% block branding %}{% endblock %}
+{% block nav-sidebar %}{% include "admin/nav_sidebar.html" %}{% endblock %}
+
+{% block extrastyle %}
+  <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin-control.css' %}">
+{% endblock %}
+
+{% comment %}
+  On phones the sidebar becomes an off-canvas drawer, so the toggle belongs in
+  the top bar next to the user tools rather than floating over the content.
+{% endcomment %}
+{% block nav-global %}
+  <button type="button" class="kc-nav-toggle" id="kc-nav-toggle"
+          aria-controls="kc-sidebar" aria-expanded="false">
+    <svg class="kc-icon" aria-hidden="true" focusable="false" width="18" height="18"><use href="#icon-menu"></use></svg>
+    <span class="kc-sr-only">{% translate "Toggle navigation" %}</span>
+  </button>
+{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  {% comment %}One shared icon sprite; referenced by <use href="#icon-..."> everywhere.{% endcomment %}
+  {% include "admin/_icons.svg" %}
+  <script src="{% static 'js/admin-control.js' %}" defer></script>
+{% endblock %}

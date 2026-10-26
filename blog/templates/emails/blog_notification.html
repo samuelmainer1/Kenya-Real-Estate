@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>New Blog Post</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #30ca9f;">New Blog Post: {{ blog.title }}</h2>
+        
+        <div style="margin: 20px 0;">
+            <img src="{{ blog.image.url }}" alt="{{ blog.title }}" style="width: 100%; max-width: 500px; border-radius: 8px;">
+        </div>
+        
+        <p><strong>{{ blog.short_description }}</strong></p>
+        
+        <p>Read time: {{ blog.read_time }} minutes</p>
+        
+        <a href="http://{{ request.get_host }}{% url 'blog_detail' blog.slug %}" 
+           style="display: inline-block; background: #30ca9f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 20px 0;">
+            Read Full Article
+        </a>
+        
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+        
+        <p style="font-size: 12px; color: #666;">
+            You received this email because you subscribed to {{ site_name }} blog updates.
+            <a href="http://{{ request.get_host }}{{ subscription.get_unsubscribe_url }}" style="color: #30ca9f;">Unsubscribe</a>
+        </p>
+    </div>
+</body>
+</html>

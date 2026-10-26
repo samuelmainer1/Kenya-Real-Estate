@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reviews for {{ listing.title }} | {{ site_name }}{% endblock %}
+
+{% block content %}
+<section id="showcase-inner" class="py-5 text-white">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-md-12">
+        <h1 class="display-4">Reviews for {{ listing.title }}</h1>
+        <p class="lead">{{ listing.city }}, {{ listing.state }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Property Info -->
+<section class="py-4 bg-light">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-3">
+        <img src="{{ listing.photo_main.url }}" alt="{{ listing.title }}" class="img-fluid rounded">
+      </div>
+      <div class="col-md-6">
+        <h4>{{ listing.title }}</h4>
+        <p class="text-muted">{{ listing.address }}, {{ listing.city }}, {{ listing.state }}</p>
+        <p><strong>Ksh {{ listing.price|floatformat:0|add:"0"|slice:":"|add:","|add:listing.price|floatformat:0|add:"0"|slice:"1:" }}</strong></p>
+      </div>
+      <div class="col-md-3 text-end">
+        <a href="{% url 'listing' listing.slug %}" class="btn btn-primary">
+          <i class="fas fa-arrow-left"></i> Back to Property
+        </a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'testimonials:add_testimonial' listing.slug %}" class="btn btn-success mt-2">
+            <i class="fas fa-plus"></i> Write Review
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Testimonials -->
+{% if featured_testimonials %}
+<section id="featured-testimonials" class="py-5">
+  <div class="container">
+    <h2 class="text-center mb-5">Featured Reviews</h2>
+    <div class="row">
+      {% for testimonial in featured_testimonials %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 border-warning">
+          <div class="card-body">
+            <div class="text-center mb-3">
+              {% for star in testimonial.get_filled_stars %}
+                <i class="fas fa-star text-warning"></i>
+              {% endfor %}
+              {% for star in testimonial.get_empty_stars %}
+                <i class="far fa-star text-warning"></i>
+              {% endfor %}
+            </div>
+            <h5 class="card-title">{{ testimonial.title }}</h5>
+            <p class="card-text">{{ testimonial.content|truncatewords:20 }}</p>
+            <footer class="blockquote-footer">
+              <cite title="Source Title">{{ testimonial.name }}</cite>
+              <small class="text-muted">{{ testimonial.created_at|date:"M d, Y" }}</small>
+            </footer>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- All Testimonials -->
+<section id="testimonials" class="py-5 bg-light">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <h3 class="mb-4">All Reviews ({{ testimonials.paginator.count }})</h3>
+        
+        {% if testimonials %}
+          <div class="row">
+            {% for testimonial in testimonials %}
+            <div class="col-md-6 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="card-title mb-0">{{ testimonial.title }}</h6>
+                    <div class="text-nowrap">
+                      {% for star in testimonial.get_filled_stars %}
+                        <i class="fas fa-star text-warning"></i>
+                      {% endfor %}
+                      {% for star in testimonial.get_empty_stars %}
+                        <i class="far fa-star text-warning"></i>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <p class="card-text">{{ testimonial.content }}</p>
+                  <footer class="blockquote-footer">
+                    <cite title="Source Title">{{ testimonial.name }}</cite>
+                    <small class="text-muted">{{ testimonial.created_at|date:"M d, Y" }}</small>
+                  </footer>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          
+          <!-- Pagination -->
+          {% if testimonials.has_other_pages %}
+          <nav aria-label="Testimonials pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+              {% if testimonials.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ testimonials.previous_page_number }}">
+                    <i class="fas fa-chevron-left"></i> Previous
+                  </a>
+                </li>
+              {% endif %}
+              
+              {% for num in testimonials.paginator.page_range %}
+                {% if testimonials.number == num %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                  </li>
+                {% elif num > testimonials.number|add:'-3' and num < testimonials.number|add:'3' %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+              
+              {% if testimonials.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ testimonials.next_page_number }}">
+                    Next <i class="fas fa-chevron-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        {% else %}
+          <div class="alert alert-info">
+            <h4>No reviews yet</h4>
+            <p>Be the first to review this property!</p>
+            {% if user.is_authenticated %}
+              <a href="{% url 'testimonials:add_testimonial' listing.slug %}" class="btn btn-primary">
+                <i class="fas fa-star"></i> Write First Review
+              </a>
+            {% else %}
+              <p><a href="{% url 'login' %}">Login</a> to write a review.</p>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Sidebar -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Property Details</h5>
+          </div>
+          <div class="card-body">
+            <p><strong>Bedrooms:</strong> {{ listing.bedrooms }}</p>
+            <p><strong>Bathrooms:</strong> {{ listing.bathrooms }}</p>
+            <p><strong>Square Feet:</strong> {{ listing.sqft|floatformat:0 }}</p>
+            <p><strong>Property Type:</strong> {{ listing.get_property_type_display }}</p>
+          </div>
+        </div>
+        
+        <div class="card mt-4">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Review Summary</h5>
+          </div>
+          <div class="card-body text-center">
+            <h3 class="text-success">{{ testimonials.paginator.count }}</h3>
+            <p class="mb-0">Total Reviews</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

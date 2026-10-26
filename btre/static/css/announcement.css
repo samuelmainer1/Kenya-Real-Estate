@@ -1,0 +1,34 @@
+/* Site-wide announcement banner (Control Centre -> Site settings).
+ *
+ * Sits above the sticky header so it behaves like a page-level notice rather
+ * than an overlay. Colours match the navbar's brand navy / green.
+ */
+.site-announcement {
+  background: linear-gradient(90deg, #10284e 0%, #1c5f7a 55%, #28b894 100%);
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.site-announcement-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1rem;
+  text-align: center;
+}
+
+.site-announcement-inner i {
+  color: #7ff0cd;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 575px) {
+  .site-announcement {
+    font-size: 0.82rem;
+  }
+
+  .site-announcement-inner {
+    padding: 0.5rem 0.75rem;
+  }
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #20866b 0%, #0f4033 100%); color: white; padding: 20px; border-radius: 5px 5px 0 0; }
+        .content { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 0 0 5px 5px; }
+        .property-details { background: white; padding: 15px; margin: 15px 0; border-left: 4px solid #20866b; }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+        .btn { display: inline-block; padding: 10px 20px; background: #20866b; color: white; text-decoration: none; border-radius: 5px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Welcome to {{ property.title }}!</h2>
+        </div>
+        <div class="content">
+            <p>Hello {{ tenant.get_full_name }},</p>
+            
+            <p>Welcome to your new home! We are delighted to have you as a tenant at {{ property.title }}. This email contains important information about your lease and our property management services.</p>
+            
+            <div class="property-details">
+                <h3>Property Information</h3>
+                <p><strong>Address:</strong> {{ property.address }}, {{ property.city }}, {{ property.state }}</p>
+                <p><strong>Move-in Date:</strong> {{ tenant.move_in_date|date:"F d, Y" }}</p>
+                <p><strong>Lease Start Date:</strong> {{ tenant.lease_start_date|date:"F d, Y" }}</p>
+                <p><strong>Lease End Date:</strong> {{ tenant.lease_end_date|date:"F d, Y" }}</p>
+                <p><strong>Monthly Rent:</strong> KES {{ monthly_rent|floatformat:0 }}</p>
+                <p><strong>Deposit Amount:</strong> KES {{ tenant.deposit_amount|floatformat:0 }}</p>
+            </div>
+            
+            <h3>Important Information</h3>
+            <ul>
+                <li><strong>Rent Payment:</strong> Rent is due on the 1st of each month. Please arrange payment through your preferred method.</li>
+                <li><strong>Maintenance Requests:</strong> For any maintenance issues, please contact us immediately through the tenant portal.</li>
+                <li><strong>Property Rules:</strong> Please review the lease agreement for all property rules and regulations.</li>
+                <li><strong>Emergency Contact:</strong> In case of emergencies, please call our 24/7 hotline.</li>
+            </ul>
+            
+            <h3>Next Steps</h3>
+            <p>Please complete the following within 7 days of move-in:</p>
+            <ol>
+                <li>Sign and return the lease agreement</li>
+                <li>Provide proof of renters insurance</li>
+                <li>Complete the move-in inspection form</li>
+                <li>Set up your tenant portal account</li>
+            </ol>
+            
+            <p>If you have any questions or need assistance, please don't hesitate to contact us.</p>
+            
+            <p><strong>Contact Information:</strong></p>
+            <p>Email: samuelmainer@gmail.com<br>Phone: +254 722 359 298</p>
+            
+            <div class="footer">
+                <p>This is an automated email from {{ site_name }} Property Management System.</p>
+                <p>&copy; 2025 {{ site_name }}. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

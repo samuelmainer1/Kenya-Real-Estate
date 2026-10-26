@@ -1,0 +1,272 @@
+:root {
+  --brand-blue: #10284e;
+  --brand-green: #30caa0;
+  --brand-green-light: #4dd4b0;
+  --brand-green-dark: #28b894;
+  --text-dark: #2c3e50;
+  --text-light: #7f8c8d;
+  --bg-light: #f8f9fa;
+  --white: #f8f9fa;
+  --shadow: 0 8px 32px rgba(16, 40, 78, 0.12);
+  --shadow-hover: 0 12px 40px rgba(16, 40, 78, 0.18);
+}
+
+.vincent-searchbar {
+  background: rgba(255,255,255,0.95);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 2.5rem 2rem;
+  margin-top: 5rem;
+  margin-bottom: 3rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 10;
+  font-family: 'Poppins', sans-serif;
+  backdrop-filter: blur(20px) saturate(140%);
+  border: 2px solid rgba(48, 202, 160, 0.1);
+  transition: all 0.3s ease;
+}
+
+.vincent-searchbar:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(48, 202, 160, 0.2);
+}
+
+.vincent-searchbar .form-group {
+  position: relative;
+  margin-bottom: 0;
+}
+
+.vincent-searchbar .form-control, 
+.vincent-searchbar .form-select {
+  border-radius: 16px;
+  padding: 1rem 1rem 1rem 3rem;
+  font-size: 1rem;
+  background: var(--white);
+  border: 2px solid #e9ecef;
+  box-shadow: 0 2px 8px rgba(16, 40, 78, 0.04);
+  height: 3.5rem;
+  margin-bottom: 0;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.vincent-searchbar .form-control:focus, 
+.vincent-searchbar .form-select:focus {
+  border: 2px solid var(--brand-green);
+  box-shadow: 0 4px 20px rgba(48, 202, 160, 0.15);
+  outline: none;
+  background: var(--white);
+}
+
+.vincent-searchbar .form-control::placeholder {
+  color: #adb5bd;
+  font-weight: 400;
+  font-size: 0.95rem;
+}
+
+.vincent-searchbar .input-icon {
+  position: absolute;
+  left: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--brand-green);
+  font-size: 1.1rem;
+  z-index: 3;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.vincent-searchbar .form-control:focus + .input-icon,
+.vincent-searchbar .form-select:focus + .input-icon {
+  color: var(--brand-green-dark);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.vincent-searchbar .form-label {
+  font-size: 0.9rem;
+  color: var(--brand-blue);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  margin-left: 0.2rem;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.vincent-searchbar .btn {
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-radius: 16px;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
+  color: var(--white);
+  border: none;
+  box-shadow: 0 4px 20px rgba(48, 202, 160, 0.25);
+  transition: all 0.3s ease;
+  width: 100%;
+  min-width: 140px;
+  margin-left: 0;
+  margin-right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.vincent-searchbar .btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.vincent-searchbar .btn:hover {
+  background: linear-gradient(135deg, var(--brand-green-dark) 0%, var(--brand-green) 100%);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(48, 202, 160, 0.35);
+}
+
+.vincent-searchbar .btn:hover::before {
+  left: 100%;
+}
+
+.vincent-searchbar .btn i {
+  font-size: 1.1rem;
+}
+
+.search-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.search-title {
+  color: var(--brand-blue);
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.search-subtitle {
+  color: var(--text-light);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: end;
+}
+
+.form-col {
+  flex: 1;
+  min-width: 180px;
+}
+
+.form-col-search {
+  flex: 1.2;
+  min-width: 220px;
+}
+
+.form-col-price {
+  flex: 0.8;
+  min-width: 160px;
+}
+
+.form-col-btn {
+  flex: 0 0 auto;
+  min-width: 160px;
+}
+
+.vincent-searchbar .form-select {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.vincent-searchbar .form-select option {
+  padding: 0.5rem;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 1200px) {
+  .vincent-searchbar {
+    padding: 2rem 1.5rem;
+  }
+  
+  .form-col, .form-col-search {
+    flex: 1 1 calc(50% - 0.75rem);
+    min-width: 180px;
+  }
+  
+  .form-col-price {
+    flex: 1 1 calc(50% - 0.75rem);
+    min-width: 160px;
+  }
+  
+  .form-col-btn {
+    flex: 1 1 100%;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .vincent-searchbar {
+    padding: 1.5rem 1rem;
+    margin-top: 4rem;
+    margin-bottom: 2rem;
+  }
+  
+  .form-col, .form-col-search, .form-col-price {
+    flex: 1 1 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .form-col-btn {
+    margin-top: 0;
+  }
+  
+  .vincent-searchbar .form-control, 
+  .vincent-searchbar .form-select {
+    height: 3.2rem;
+    font-size: 0.95rem;
+  }
+  
+  .vincent-searchbar .btn {
+    height: 3.2rem;
+    font-size: 1rem;
+  }
+  
+  .search-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .vincent-searchbar {
+    padding: 1rem 0.8rem;
+    margin-top: 3.5rem;
+  }
+  
+  .vincent-searchbar .form-control, 
+  .vincent-searchbar .form-select {
+    padding-left: 2.5rem;
+  }
+  
+  .vincent-searchbar .input-icon {
+    left: 1rem;
+    font-size: 1rem;
+  }
+} 

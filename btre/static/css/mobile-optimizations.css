@@ -1,0 +1,66 @@
+/* Mobile-First Performance Optimizations */
+:root {
+  --brand-blue: #10284e;
+  --brand-green: #30caa0;
+  --brand-green-light: #4dd4b0;
+  --brand-green-dark: #28b894;
+  --text-dark: #2c3e50;
+  --text-light: #7f8c8d;
+  --white: #f8f9fa;
+  --light-bg: #f8f9fa;
+  --shadow: 0 8px 32px rgba(16, 40, 78, 0.12);
+  --shadow-hover: 0 16px 48px rgba(16, 40, 78, 0.18);
+  --gradient-primary: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-green) 100%);
+}
+
+/* Lazy Loading Images */
+.lazy-image {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.lazy-image.loaded {
+  opacity: 1;
+}
+
+/* Mobile-First Grid System */
+.mobile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .mobile-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .mobile-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    padding: 2rem;
+  }
+}
+
+/* Performance optimized animations */
+.performance-card {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

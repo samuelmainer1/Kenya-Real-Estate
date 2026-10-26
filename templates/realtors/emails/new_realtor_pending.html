@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #10284e 0%, #30caa0 100%); color: white; padding: 20px; border-radius: 5px 5px 0 0; }
+        .content { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 0 0 5px 5px; }
+        .details { background: white; padding: 15px; margin: 15px 0; border-left: 4px solid #30caa0; }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+        .btn { display: inline-block; padding: 10px 20px; background: #10284e; color: white !important; text-decoration: none; border-radius: 5px; margin-top: 10px; margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>New realtor pending verification</h2>
+        </div>
+        <div class="content">
+            <p>A new realtor profile was added on <strong>{{ site_name }}</strong> and needs admin verification before their listings can go live.</p>
+
+            <div class="details">
+                <p><strong>Name:</strong> {{ realtor.name }}</p>
+                <p><strong>Email:</strong> {{ realtor.email }}</p>
+                <p><strong>Phone:</strong> {{ realtor.phone }}</p>
+                {% if realtor.description %}
+                <p><strong>About:</strong> {{ realtor.description|truncatewords:40 }}</p>
+                {% endif %}
+            </div>
+
+            <p>Open the admin panel to review their profile and use <strong>Verify selected realtors</strong> once approved.</p>
+
+            <a href="{{ admin_url }}" class="btn">Review realtor</a>
+            <a href="{{ pending_url }}" class="btn">View all pending</a>
+        </div>
+        <div class="footer">
+            <p>{{ site_name }} admin notification</p>
+        </div>
+    </div>
+</body>
+</html>

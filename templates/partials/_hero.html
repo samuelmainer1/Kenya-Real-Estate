@@ -1,0 +1,171 @@
+{% load static %}
+<!-- Modern Hero Section for {{ site_name }} -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  .vincent-hero {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: url('{% static 'img/showcase.avif' %}') no-repeat center center/cover;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+  }
+  .vincent-hero-animated-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(32,134,107,0.35) 0%, rgba(15,64,51,0.25) 100%);
+    animation: gradientMove 8s ease-in-out infinite alternate;
+    z-index: 1;
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+  }
+  @keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+  }
+  .vincent-hero-content {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 4.5rem 2.5rem 3.5rem 2.5rem;
+    border-radius: 40px;
+    background: rgba(255,255,255,0.18);
+    box-shadow: 0 12px 48px 0 rgba(31,38,135,0.18);
+    backdrop-filter: blur(18px) saturate(160%);
+    border: 1.5px solid rgba(255,255,255,0.22);
+    animation: fadeInUp 1.2s cubic-bezier(.39,.575,.56,1.000);
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(40px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .vincent-hero-logo {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 1.5rem;
+    border-radius: 50%;
+    background: rgba(32,134,107,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 2px 12px rgba(32,134,107,0.10);
+  }
+  .vincent-hero-title {
+    font-size: 3.2rem;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 0.7rem;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.18);
+    line-height: 1.08;
+    animation: fadeInUp 1.4s 0.2s both;
+  }
+  .vincent-hero-highlight {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.4em 1.3em;
+    border-radius: 2em;
+    background: linear-gradient(90deg, #20866b 60%, #0f4033 100%);
+    color: #fff;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 12px rgba(32,134,107,0.10);
+    animation: fadeInUp 1.4s 0.35s both;
+  }
+  .vincent-hero-content .hero-sub {
+    font-size: 1.25rem;
+    color: #f3f3f3;
+    margin: 2.2rem 0 2.5rem 0;
+    animation: fadeInUp 1.4s 0.5s both;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+  .vincent-hero-content .btn {
+    padding: 1.1rem 3.2rem;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    background: linear-gradient(90deg, #fff 0%, #e4e4e4 100%);
+    color: #20866b;
+    border: none;
+    box-shadow: 0 4px 16px rgba(32,134,107,0.10);
+    transition: all 0.3s, transform 0.3s;
+    animation: floatBtn 2.5s infinite alternate;
+    margin-top: 0.5rem;
+  }
+  .vincent-hero-content .btn:hover {
+    background: #20866b;
+    color: #fff;
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 8px 32px rgba(32,134,107,0.18);
+  }
+  @keyframes floatBtn {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-8px); }
+  }
+  .scroll-down-indicator {
+    position: absolute;
+    left: 50%;
+    bottom: 32px;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0.85;
+    animation: fadeInUp 1.2s 1.2s both;
+  }
+  .scroll-down-indicator span {
+    display: block;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    color: #20866b;
+    font-size: 1.5rem;
+    text-align: center;
+    line-height: 28px;
+    margin-bottom: 0.2rem;
+    animation: bounce 1.5s infinite alternate;
+  }
+  @keyframes bounce {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(10px); }
+  }
+  @media (max-width: 600px) {
+    .vincent-hero-title {
+      font-size: 2.1rem;
+    }
+    .vincent-hero-content {
+      padding: 1.5rem 0.5rem 1.2rem 0.5rem;
+      border-radius: 18px;
+    }
+    .vincent-hero-highlight {
+      font-size: 1rem;
+      padding: 0.3em 1em;
+    }
+  }
+</style>
+<section class="vincent-hero">
+  <div class="vincent-hero-animated-overlay"></div>
+  <div class="vincent-hero-content">
+    <div class="vincent-hero-logo">
+      <img src="{% static 'img/logo.jpeg' %}" alt="{{ site_name }} Logo" style="width:52px;height:auto;max-width:120px;object-fit:contain;border-radius:6px;">
+    </div>
+    <div class="vincent-hero-title">Find Your Dream Home</div>
+    <div class="vincent-hero-highlight">with {{ site_name }}</div>
+
+    <a href="{% url 'property_management' %}" class="btn">Property Management</a>
+  </div>
+  <div class="scroll-down-indicator">
+    <span><i class="fas fa-chevron-down"></i></span>
+  </div>
+</section> 

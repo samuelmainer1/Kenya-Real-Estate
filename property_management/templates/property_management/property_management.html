@@ -1,0 +1,1071 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Property Management in Kenya | {{ site_name }}{% endblock %}
+
+{% block meta_description %}{{ site_name }} provides professional property management in Kenya — tenant management, maintenance scheduling, rent collection, and owner reporting.{% endblock %}
+
+{% block og_title %}Property Management Services | {{ site_name }}{% endblock %}
+
+{% block og_description %}Expert residential and commercial property management across Kenya.{% endblock %}
+
+{% block og_url %}{{ site_url }}/property-management/{% endblock %}
+{% block canonical_url %}{{ site_url }}/property-management/{% endblock %}
+
+{% block content %}
+<!-- Hero Section 
+<section class="pm-hero-section">
+  <div class="pm-hero-overlay"></div>
+  <div class="container-fluid px-4 px-lg-5">
+    <div class="row align-items-center min-vh-100">
+      <div class="col-lg-6 pm-hero-content">
+        <div class="pm-hero-badge">
+          <i class="fas fa-star"></i> Professional Property Management
+        </div>
+        <h1 class="pm-hero-title">
+          Expert Property Management Services
+        </h1>
+        <p class="pm-hero-subtitle">
+          Let {{ site_name }} manage your properties while you focus on what matters. We handle everything from tenant management to maintenance and rent collection.
+        </p>
+        <div class="pm-hero-features">
+          <div class="pm-feature-item">
+            <i class="fas fa-check-circle"></i>
+            <span>Professional Tenant Management</span>
+          </div>
+          <div class="pm-feature-item">
+            <i class="fas fa-check-circle"></i>
+            <span>Maintenance & Repairs</span>
+          </div>
+          <div class="pm-feature-item">
+            <i class="fas fa-check-circle"></i>
+            <span>Rent Collection & Accounting</span>
+          </div>
+          <div class="pm-feature-item">
+            <i class="fas fa-check-circle"></i>
+            <span>24/7 Property Monitoring</span>
+          </div>
+        </div>
+        <div class="pm-hero-cta">
+          <a href="#managed-properties" class="btn btn-primary-pm">
+            <i class="fas fa-arrow-down"></i> View Our Managed Properties
+          </a>
+          <a href="{% url 'contact' %}" class="btn btn-secondary-pm">
+            <i class="fas fa-phone"></i> Get in Touch
+          </a>
+          {% if user.is_staff %}
+          <a href="{% url 'analytics_dashboard' %}" class="btn btn-secondary-pm">
+            <i class="fas fa-chart-line"></i> View Performance Dashboard
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-6 pm-hero-image">
+        <div class="pm-hero-image-wrapper">
+          <div class="pm-image-card pm-image-1">
+            <i class="fas fa-building"></i>
+            <p>Property Oversight</p>
+          </div>
+          <div class="pm-image-card pm-image-2">
+            <i class="fas fa-users"></i>
+            <p>Tenant Management</p>
+          </div>
+          <div class="pm-image-card pm-image-3">
+            <i class="fas fa-tools"></i>
+            <p>Maintenance</p>
+          </div>
+          <div class="pm-image-card pm-image-4">
+            <i class="fas fa-chart-line"></i>
+            <p>Analytics</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<!-- Services Section -->
+<section class="pm-services-section py-5">
+  <div class="container-fluid px-4 px-lg-5">
+    <div class="row mb-5">
+      <div class="col-lg-8 mx-auto text-center">
+        <h2 class="pm-section-title">Our Property Management Services</h2>
+        <p class="pm-section-subtitle">
+          Comprehensive solutions designed to maximize your property's potential and minimize your stress
+        </p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="pm-service-card">
+          <div class="pm-service-icon">
+            <i class="fas fa-users-cog"></i>
+          </div>
+          <h4>Tenant Management</h4>
+          <p>Screening, placement, and ongoing management of quality tenants to ensure stable occupancy and timely rent payments.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="pm-service-card">
+          <div class="pm-service-icon">
+            <i class="fas fa-wrench"></i>
+          </div>
+          <h4>Maintenance & Repairs</h4>
+          <p>Proactive maintenance scheduling and emergency repairs to keep your properties in excellent condition.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="pm-service-card">
+          <div class="pm-service-icon">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+          <h4>Rent Collection</h4>
+          <p>Reliable rent collection, accounting, and financial reporting to ensure consistent cash flow.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="pm-service-card">
+          <div class="pm-service-icon">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          <h4>Analytics & Reports</h4>
+          <p>Detailed performance analytics and regular reports to track your property's financial health.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us Section 
+<section class="pm-why-section py-5 bg-light">
+  <div class="container-fluid px-4 px-lg-5">
+    <div class="row mb-5">
+      <div class="col-lg-8 mx-auto text-center">
+        <h2 class="pm-section-title">Why Choose {{ site_name }} for Property Management?</h2>
+        <p class="pm-section-subtitle">
+          We're committed to maximizing your property's value and providing peace of mind
+        </p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="pm-benefit-card">
+          <div class="pm-benefit-number">01</div>
+          <h4>Expert Team</h4>
+          <p>Our experienced property managers have years of expertise in the Kenyan real estate market.</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="pm-benefit-card">
+          <div class="pm-benefit-number">02</div>
+          <h4>Transparent Reporting</h4>
+          <p>Real-time access to property performance metrics and detailed financial reports.</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="pm-benefit-card">
+          <div class="pm-benefit-number">03</div>
+          <h4>24/7 Support</h4>
+          <p>Round-the-clock monitoring and support for any property emergencies or issues.</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="pm-benefit-card">
+          <div class="pm-benefit-number">04</div>
+          <h4>Competitive Rates</h4>
+          <p>Transparent, competitive management fees with no hidden charges.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<!-- Managed Properties Section -->
+<section class="pm-properties-section py-5" id="managed-properties">
+  <div class="container-fluid px-4 px-lg-5">
+    <div class="row mb-5">
+      <div class="col-lg-8">
+        <h2 class="pm-section-title">Properties We're Managing</h2>
+        <p class="pm-section-subtitle">
+          Currently managing {{ managed_properties.count }} properties across Kenya
+        </p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <div class="pm-stats-card">
+          <div class="pm-stat-item">
+            <div class="pm-stat-number">{{ managed_properties.count }}</div>
+            <div class="pm-stat-label">Properties</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-5">
+      <div class="col-12">
+        <div class="pm-filter-card">
+          <h5 class="pm-filter-title">
+            <i class="fas fa-filter"></i> Filter Properties
+          </h5>
+          <form method="get" class="row g-3">
+            <div class="col-md-4">
+              <label for="occupancy" class="pm-filter-label">Occupancy Status</label>
+              <select class="pm-filter-select" id="occupancy" name="occupancy">
+                <option value="">All Status</option>
+                <option value="occupied" {% if occupancy_filter == 'occupied' %}selected{% endif %}>Occupied</option>
+                <option value="vacant" {% if occupancy_filter == 'vacant' %}selected{% endif %}>Vacant</option>
+                <option value="under_maintenance" {% if occupancy_filter == 'under_maintenance' %}selected{% endif %}>Under Maintenance</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="maintenance" class="pm-filter-label">Maintenance Status</label>
+              <select class="pm-filter-select" id="maintenance" name="maintenance">
+                <option value="">All Properties</option>
+                <option value="true" {% if maintenance_filter == 'true' %}selected{% endif %}>Requires Maintenance</option>
+              </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <button type="submit" class="btn btn-primary-pm w-100">
+                <i class="fas fa-filter"></i> Apply Filters
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Properties Grid -->
+    {% if managed_properties %}
+      <div class="row g-4">
+        {% for managed_property in managed_properties %}
+          <div class="col-md-6 col-lg-4">
+            <div class="pm-property-card">
+              <!-- Image Container -->
+              <div class="pm-property-image-wrapper">
+                <img src="{{ managed_property.listing.photo_main.url }}"
+                     alt="{{ managed_property.listing.title }}"
+                     class="pm-property-image"
+                     loading="lazy">
+
+                <!-- Status Badges -->
+                <div class="pm-badge-group pm-badge-top-left">
+                  <span class="pm-badge pm-badge-primary">
+                    {{ managed_property.get_management_status_display }}
+                  </span>
+                  {% if managed_property.maintenance_required %}
+                    <span class="pm-badge pm-badge-warning">
+                      <i class="fas fa-exclamation-triangle"></i> Maintenance
+                    </span>
+                  {% endif %}
+                </div>
+
+                <!-- Occupancy Badge -->
+                <div class="pm-badge-group pm-badge-top-right">
+                  {% if managed_property.occupancy_status == 'occupied' %}
+                    <span class="pm-badge pm-badge-occupied">
+                      <i class="fas fa-check-circle"></i> Occupied
+                    </span>
+                  {% elif managed_property.occupancy_status == 'vacant' %}
+                    <span class="pm-badge pm-badge-vacant">
+                      <i class="fas fa-home"></i> Vacant
+                    </span>
+                  {% else %}
+                    <span class="pm-badge pm-badge-maintenance">
+                      <i class="fas fa-tools"></i> Under Maintenance
+                    </span>
+                  {% endif %}
+                </div>
+
+                <!-- Overlay -->
+                <div class="pm-property-overlay">
+                  <a href="{% url 'managed_property_detail' managed_property.pk %}" class="pm-overlay-btn">
+                    <i class="fas fa-eye"></i> View Details
+                  </a>
+                </div>
+              </div>
+
+              <!-- Card Content -->
+              <div class="pm-property-content">
+                <h3 class="pm-property-title">{{ managed_property.listing.title }}</h3>
+
+                <p class="pm-property-location">
+                  <i class="fas fa-map-marker-alt"></i>
+                  {{ managed_property.listing.address }}, {{ managed_property.listing.city }}
+                </p>
+
+                <!-- Property Specs -->
+                <div class="pm-property-specs">
+                  <div class="pm-spec-item">
+                    <i class="fas fa-bed"></i>
+                    <span>{{ managed_property.listing.bedrooms }} Beds</span>
+                  </div>
+                  <div class="pm-spec-item">
+                    <i class="fas fa-bath"></i>
+                    <span>{{ managed_property.listing.bathrooms }} Baths</span>
+                  </div>
+                  <div class="pm-spec-item">
+                    <i class="fas fa-ruler-combined"></i>
+                    <span>{{ managed_property.listing.sqft }} Sqft</span>
+                  </div>
+                </div>
+
+                <!-- Management Details -->
+                <div class="pm-management-info">
+                  <div class="pm-info-row">
+                    <span class="pm-info-label">Managing Since:</span>
+                    <span class="pm-info-value">{{ managed_property.management_start_date|date:"M d, Y" }}</span>
+                  </div>
+                  {% if managed_property.last_inspection_date %}
+                    <div class="pm-info-row">
+                      <span class="pm-info-label">Last Inspection:</span>
+                      <span class="pm-info-value">{{ managed_property.last_inspection_date|date:"M d, Y" }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+
+                <!-- Price -->
+                <div class="pm-property-price">
+                  KES {{ managed_property.listing.price|floatformat:0 }}
+                </div>
+
+                <!-- Action Button -->
+                <a href="{% url 'managed_property_detail' managed_property.pk %}" class="pm-property-btn">
+                  <i class="fas fa-arrow-right"></i> View Full Details
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="pm-empty-state">
+        <div class="pm-empty-icon">
+          <i class="fas fa-inbox"></i>
+        </div>
+        <h4>No Properties Under Management</h4>
+        <p>There are currently no properties matching your filters.</p>
+        <a href="{% url 'property_management' %}" class="btn btn-primary-pm">
+          <i class="fas fa-redo"></i> Clear Filters
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  :root {
+    --pm-primary: #10284e;
+    --pm-accent: #30caa0;
+    --pm-accent-dark: #28b894;
+    --pm-accent-light: #4dd4b0;
+    --pm-text-dark: #2c3e50;
+    --pm-text-light: #7f8c8d;
+    --pm-bg-light: #f8f9fa;
+    --pm-border: #e0e0e0;
+    --pm-transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Hero Section */
+  .pm-hero-section {
+    position: relative;
+    background: linear-gradient(135deg, #10284e 0%, #1a3a5c 100%);
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .pm-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="1200" height="600" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+  }
+
+  .pm-hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    animation: fadeInUp 1s ease-out;
+  }
+
+  .pm-hero-badge {
+    display: inline-block;
+    background: rgba(48, 202, 160, 0.2);
+    border: 1px solid rgba(48, 202, 160, 0.5);
+    color: #4dd4b0;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .pm-hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    letter-spacing: -1px;
+  }
+
+  .pm-hero-subtitle {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    opacity: 0.95;
+    max-width: 500px;
+  }
+
+  .pm-hero-features {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .pm-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.05rem;
+  }
+
+  .pm-feature-item i {
+    color: #4dd4b0;
+    font-size: 1.3rem;
+  }
+
+  .pm-hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary-pm {
+    background: linear-gradient(135deg, #30caa0 0%, #28b894 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.05rem;
+    transition: var(--pm-transition);
+    box-shadow: 0 8px 20px rgba(48, 202, 160, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-primary-pm:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(48, 202, 160, 0.4);
+    color: white;
+    text-decoration: none;
+  }
+
+  .btn-secondary-pm {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 0.9rem 1.9rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.05rem;
+    transition: var(--pm-transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-secondary-pm:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+    text-decoration: none;
+  }
+
+  .pm-hero-image {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pm-hero-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 400px;
+  }
+
+  .pm-image-card {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    color: white;
+    transition: var(--pm-transition);
+  }
+
+  .pm-image-card i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #4dd4b0;
+  }
+
+  .pm-image-card p {
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .pm-image-1 {
+    width: 150px;
+    top: 0;
+    left: 0;
+  }
+
+  .pm-image-2 {
+    width: 150px;
+    top: 0;
+    right: 0;
+  }
+
+  .pm-image-3 {
+    width: 150px;
+    bottom: 0;
+    left: 0;
+  }
+
+  .pm-image-4 {
+    width: 150px;
+    bottom: 0;
+    right: 0;
+  }
+
+  .pm-image-card:hover {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(48, 202, 160, 0.2);
+  }
+
+  /* Services Section */
+  .pm-services-section {
+    background: white;
+  }
+
+  .pm-section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--pm-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .pm-section-subtitle {
+    font-size: 1.1rem;
+    color: var(--pm-text-light);
+    margin-bottom: 0;
+  }
+
+  .pm-service-card {
+    background: white;
+    border: 2px solid var(--pm-border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    transition: var(--pm-transition);
+    height: 100%;
+  }
+
+  .pm-service-card:hover {
+    border-color: var(--pm-accent);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(48, 202, 160, 0.15);
+  }
+
+  .pm-service-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #30caa0 0%, #28b894 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+  }
+
+  .pm-service-card h4 {
+    color: var(--pm-primary);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+  }
+
+  .pm-service-card p {
+    color: var(--pm-text-light);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Why Section */
+  .pm-why-section {
+    background: var(--pm-bg-light);
+  }
+
+  .pm-benefit-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    transition: var(--pm-transition);
+    border-left: 4px solid var(--pm-accent);
+  }
+
+  .pm-benefit-card:hover {
+    transform: translateX(8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .pm-benefit-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--pm-accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .pm-benefit-card h4 {
+    color: var(--pm-primary);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    font-size: 1.2rem;
+  }
+
+  .pm-benefit-card p {
+    color: var(--pm-text-light);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Filter Card */
+  .pm-filter-card {
+    background: white;
+    border: 2px solid var(--pm-border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: var(--pm-transition);
+  }
+
+  .pm-filter-card:hover {
+    border-color: var(--pm-accent);
+    box-shadow: 0 8px 24px rgba(48, 202, 160, 0.1);
+  }
+
+  .pm-filter-title {
+    color: var(--pm-primary);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+  }
+
+  .pm-filter-label {
+    color: var(--pm-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .pm-filter-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--pm-border);
+    border-radius: 10px;
+    color: var(--pm-text-dark);
+    font-weight: 500;
+    transition: var(--pm-transition);
+    background: white;
+  }
+
+  .pm-filter-select:focus {
+    outline: none;
+    border-color: var(--pm-accent);
+    box-shadow: 0 0 0 3px rgba(48, 202, 160, 0.1);
+  }
+
+  /* Stats Card */
+  .pm-stats-card {
+    background: linear-gradient(135deg, #30caa0 0%, #28b894 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    color: white;
+    text-align: center;
+  }
+
+  .pm-stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+
+  .pm-stat-label {
+    font-size: 1rem;
+    opacity: 0.95;
+  }
+
+  /* Property Cards */
+  .pm-property-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: var(--pm-transition);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pm-property-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 16px 40px rgba(48, 202, 160, 0.2);
+  }
+
+  .pm-property-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    height: 280px;
+    background: var(--pm-bg-light);
+  }
+
+  .pm-property-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--pm-transition);
+  }
+
+  .pm-property-card:hover .pm-property-image {
+    transform: scale(1.08);
+  }
+
+  .pm-badge-group {
+    position: absolute;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 1rem;
+  }
+
+  .pm-badge-top-left {
+    top: 0;
+    left: 0;
+  }
+
+  .pm-badge-top-right {
+    top: 0;
+    right: 0;
+  }
+
+  .pm-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+  }
+
+  .pm-badge-primary {
+    background: rgba(48, 202, 160, 0.9);
+    color: white;
+  }
+
+  .pm-badge-warning {
+    background: rgba(255, 193, 7, 0.9);
+    color: #333;
+  }
+
+  .pm-badge-occupied {
+    background: rgba(52, 152, 219, 0.9);
+    color: white;
+  }
+
+  .pm-badge-vacant {
+    background: rgba(155, 89, 182, 0.9);
+    color: white;
+  }
+
+  .pm-badge-maintenance {
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+  }
+
+  .pm-property-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(16, 40, 78, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: var(--pm-transition);
+  }
+
+  .pm-property-card:hover .pm-property-overlay {
+    opacity: 1;
+  }
+
+  .pm-overlay-btn {
+    background: linear-gradient(135deg, #30caa0 0%, #28b894 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--pm-transition);
+  }
+
+  .pm-overlay-btn:hover {
+    transform: scale(1.05);
+    color: white;
+  }
+
+  .pm-property-content {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pm-property-title {
+    color: var(--pm-primary);
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .pm-property-location {
+    color: var(--pm-text-light);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pm-property-location i {
+    color: var(--pm-accent);
+  }
+
+  .pm-property-specs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--pm-border);
+  }
+
+  .pm-spec-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    text-align: center;
+  }
+
+  .pm-spec-item i {
+    color: var(--pm-accent);
+    font-size: 1.2rem;
+  }
+
+  .pm-spec-item span {
+    font-size: 0.9rem;
+    color: var(--pm-text-dark);
+    font-weight: 500;
+  }
+
+  .pm-management-info {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--pm-bg-light);
+    border-radius: 10px;
+  }
+
+  .pm-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .pm-info-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .pm-info-label {
+    color: var(--pm-text-light);
+    font-weight: 500;
+  }
+
+  .pm-info-value {
+    color: var(--pm-primary);
+    font-weight: 600;
+  }
+
+  .pm-property-price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--pm-accent);
+    margin-bottom: 1rem;
+  }
+
+  .pm-property-btn {
+    background: linear-gradient(135deg, #30caa0 0%, #28b894 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--pm-transition);
+    border: none;
+    cursor: pointer;
+  }
+
+  .pm-property-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(48, 202, 160, 0.3);
+    color: white;
+  }
+
+  /* Empty State */
+  .pm-empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--pm-bg-light);
+    border-radius: 16px;
+    border: 2px dashed var(--pm-border);
+  }
+
+  .pm-empty-icon {
+    font-size: 4rem;
+    color: var(--pm-accent);
+    margin-bottom: 1rem;
+  }
+
+  .pm-empty-state h4 {
+    color: var(--pm-primary);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .pm-empty-state p {
+    color: var(--pm-text-light);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 991px) {
+    .pm-hero-title {
+      font-size: 2.5rem;
+    }
+
+    .pm-hero-subtitle {
+      font-size: 1.1rem;
+    }
+
+    .pm-section-title {
+      font-size: 2rem;
+    }
+
+    .pm-hero-image-wrapper {
+      height: 300px;
+      margin-top: 2rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .pm-hero-title {
+      font-size: 2rem;
+    }
+
+    .pm-hero-subtitle {
+      font-size: 1rem;
+    }
+
+    .pm-hero-cta {
+      flex-direction: column;
+    }
+
+    .btn-primary-pm,
+    .btn-secondary-pm {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .pm-section-title {
+      font-size: 1.75rem;
+    }
+
+    .pm-property-specs {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .pm-image-card {
+      width: 120px !important;
+      padding: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .pm-image-card i {
+      font-size: 2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .pm-hero-title {
+      font-size: 1.75rem;
+    }
+
+    .pm-hero-subtitle {
+      font-size: 0.95rem;
+    }
+
+    .pm-section-title {
+      font-size: 1.5rem;
+    }
+
+    .pm-property-image-wrapper {
+      height: 200px;
+    }
+
+    .pm-image-1, .pm-image-2, .pm-image-3, .pm-image-4 {
+      width: 100px !important;
+      padding: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+

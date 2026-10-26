@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h2>Subscription Management</h2>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            <p class="mt-4">
+                <a href="{% url 'index' %}" class="btn btn-primary">Return to Home</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

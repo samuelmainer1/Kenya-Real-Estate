@@ -1,0 +1,127 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/footer.css' %}">
+
+<footer class="vincent-footer" role="contentinfo" aria-label="{{ site_name }} Footer">
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Brand Section -->
+      <div class="footer-brand-section">
+        <div class="footer-brand">
+          <img src="{% static 'img/logo.jpeg' %}" alt="{{ site_name }} Logo" loading="lazy">
+          <span class="footer-brand-text">{{ site_name }}</span>
+        </div>
+        <p class="footer-description">
+          Your trusted partner in finding the perfect property. We specialize in premium real estate solutions across Kenya, offering exceptional service and unmatched expertise.
+        </p>
+        <p class="footer-founder-credit" style="margin-top:-0.5rem;">
+          <i class="fas fa-user-tie" aria-hidden="true"></i> Founded by <strong>Sam Maina</strong> &mdash; Founder &amp; CEO
+        </p>
+        <div class="footer-contact-info">
+          <div class="footer-contact-item">
+            <i class="fas fa-phone-alt"></i>
+            <a href="tel:+254722359298" title="Call us at +254 722 359 298">+254 722 359 298</a>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fas fa-envelope"></i>
+            <a href="mailto:samuelmainer@gmail.com" title="Email us">samuelmainer@gmail.com</a>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Nextgen Mall, Mombasa Road, Nairobi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-links-section">
+        <h4>Quick Links</h4>
+        <ul class="footer-links-list">
+          <li><a href="/" title="Home"><i class="fas fa-chevron-right"></i>Home</a></li>
+          <li><a href="{% url 'listings' %}" title="Browse Properties"><i class="fas fa-chevron-right"></i>Properties</a></li>
+          <li><a href="{% url 'search' %}" title="Search Properties"><i class="fas fa-chevron-right"></i>Property Search</a></li>
+          <li><a href="{% url 'about' %}" title="About Us"><i class="fas fa-chevron-right"></i>About Us</a></li>
+          <li><a href="{% url 'contact' %}" title="Contact Us"><i class="fas fa-chevron-right"></i>Contact</a></li>
+          <li><a href="{% url 'services' %}" title="Our Services"><i class="fas fa-chevron-right"></i>Services</a></li>
+          <li><a href="{% url 'property_management' %}" title="Property Management"><i class="fas fa-chevron-right"></i>Property Management</a></li>
+          <li><a href="{% url 'testimonials:testimonials_list' %}" title="Client Reviews"><i class="fas fa-chevron-right"></i>Testimonials</a></li>
+          <li><a href="{% url 'faq' %}" title="Frequently Asked Questions"><i class="fas fa-chevron-right"></i>FAQ</a></li>
+        </ul>
+      </div>
+
+      <!-- Resources -->
+      <div class="footer-links-section">
+        <h4>Resources</h4>
+        <ul class="footer-links-list">
+          <li><a href="{% url 'blog_list' %}" title="Property Insights Blog"><i class="fas fa-chevron-right"></i>Blog</a></li>
+          <li><a href="{% url 'privacy_policy' %}" title="Privacy Policy"><i class="fas fa-chevron-right"></i>Privacy Policy</a></li>
+          <li><a href="{% url 'terms_of_service' %}" title="Terms of Service"><i class="fas fa-chevron-right"></i>Terms of Service</a></li>
+          <li><a href="{% url 'legal_page' 'cookie-policy' %}" title="Cookie Policy"><i class="fas fa-chevron-right"></i>Cookie Policy</a></li>
+          <li><a href="{% url 'sitemap' %}" title="Sitemap"><i class="fas fa-chevron-right"></i>Sitemap</a></li>
+        </ul>
+      </div>
+
+      <!-- Dynamic Services -->
+      <div class="footer-links-section">
+        <h4>Our Services</h4>
+        <ul class="footer-links-list">
+          {% for service in featured_services %}
+          <li>
+            <a href="{{ service.get_absolute_url }}" title="{{ service.title }}">
+              <i class="{{ service.icon_class }}"></i>{{ service.title }}
+            </a>
+          </li>
+          {% empty %}
+          <li><a href="{% url 'services' %}" title="View All Services"><i class="fas fa-home"></i>View All Services</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Social & Newsletter -->
+      <div class="footer-social-section">
+        <h4>Connect With Us</h4>
+        <div class="footer-social-links">
+          <a href="https://wa.me/254722359298" class="footer-social-link" target="_blank" rel="noopener" title="Chat on WhatsApp" aria-label="WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+          <a href="#" class="footer-social-link" target="_blank" rel="noopener" title="Follow us on Facebook" aria-label="Facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="footer-social-link" target="_blank" rel="noopener" title="Follow us on Twitter" aria-label="Twitter">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="footer-social-link" target="_blank" rel="noopener" title="Follow us on Instagram" aria-label="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="footer-social-link" target="_blank" rel="noopener" title="Connect on LinkedIn" aria-label="LinkedIn">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+        </div>
+        
+        <div class="footer-newsletter">
+          <h5>Stay Updated</h5>
+          <form class="newsletter-form" action="{% url 'footer_subscribe' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="type" value="both">
+            <input type="email" name="email" class="newsletter-input" placeholder="Enter your email" required>
+            <button type="submit" class="newsletter-btn">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+      <div class="footer-copyright">
+        &copy; {{ now|date:'Y' }} {{ site_name }}. All rights reserved.
+      </div>
+      <div class="footer-bottom-links">
+        <a href="{% url 'privacy_policy' %}" title="Privacy Policy">Privacy Policy</a>
+        <a href="{% url 'terms_of_service' %}" title="Terms of Service">Terms of Service</a>
+        <a href="/legal/cookie-policy/" title="Cookie Policy">Cookie Policy</a>
+        <a href="/sitemap.xml" title="Sitemap">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>

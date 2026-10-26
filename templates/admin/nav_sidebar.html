@@ -1,0 +1,113 @@
+{% load i18n static %}
+
+{% comment %}
+  Control Centre sidebar. Rendered by ``admin/base.html``'s ``nav-sidebar``
+  block on every admin page (the dashboard included).
+
+  Sections and their links come from ``btre/nav_sidebar.py``, which resolves
+  ``btre/admin_nav.py`` against the *current user's* admin app list - so the
+  structure is editorial while the permissions stay Django's own. Nothing here
+  links to a page the user cannot open.
+
+  Sections are native <details> elements so they collapse/expand without JS;
+  ``admin-control.css`` + ``admin-control.js`` add the search filter, the
+  active-section memory and the mobile drawer.
+{% endcomment %}
+
+<nav class="sticky kc-sidebar" id="kc-sidebar" aria-label="{% translate 'Control Centre navigation' %}">
+  <div class="kc-sidebar-head">
+    <a class="kc-sidebar-brand" href="{% url 'admin:index' %}">
+      <img src="{% static 'img/logo.png' %}" alt="" class="kc-sidebar-logo">
+      <span>
+        <strong>{% translate "Control Centre" %}</strong>
+        <small>{{ kc_site_name }}</small>
+      </span>
+    </a>
+  </div>
+
+  <div class="kc-sidebar-search">
+    {% include "admin/_icon.html" with name="search" %}
+    <input type="search" id="kc-nav-filter" class="kc-nav-filter"
+           placeholder="{% translate 'Filter menu…' %}"
+           aria-label="{% translate 'Filter navigation items' %}"
+           autocomplete="off">
+  </div>
+
+  <div class="kc-sidebar-scroll" id="kc-sidebar-scroll">
+    {% for section in kc_sections %}
+      <details class="kc-nav-group" open data-kc-group="{{ section.title }}">
+        <summary class="kc-nav-group-summary">
+          {% include "admin/_icon.html" with name=section.icon %}
+          <span class="kc-nav-group-title">{{ section.title }}</span>
+          {% include "admin/_icon.html" with name="chevron" extra_class="kc-nav-chevron" %}
+        </summary>
+        <ul class="kc-nav-links">
+          {% for link in section.links %}
+            <li class="kc-nav-link-row{% if link.active %} kc-nav-link-row-current{% endif %}">
+              <a class="kc-nav-link{% if link.active %} kc-nav-link-current{% endif %}"
+                 href="{{ link.url }}"
+                 data-kc-label="{{ link.label|lower }}"
+                 {% if link.active %}aria-current="page"{% endif %}>
+                {% include "admin/_icon.html" with name=link.icon %}
+                <span class="kc-nav-link-label">{{ link.label }}</span>
+                {% if link.count is not None %}
+                  <span class="kc-nav-count">{{ link.count }}</span>
+                {% endif %}
+              </a>
+              {% if link.add_url %}
+                <a class="kc-nav-add" href="{{ link.add_url }}"
+                   title="{% blocktranslate with name=link.label %}Add {{ name }}{% endblocktranslate %}"
+                   aria-label="{% blocktranslate with name=link.label %}Add {{ name }}{% endblocktranslate %}">
+                  {% include "admin/_icon.html" with name="plus" %}
+                </a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </details>
+    {% endfor %}
+
+    <details class="kc-nav-group kc-nav-group-site" data-kc-group="site">
+      <summary class="kc-nav-group-summary">
+        {% include "admin/_icon.html" with name="external" %}
+        <span class="kc-nav-group-title">{% translate "Site shortcuts" %}</span>
+        {% include "admin/_icon.html" with name="chevron" extra_class="kc-nav-chevron" %}
+      </summary>
+      {% for group in kc_site_groups %}
+        <p class="kc-nav-sublabel">{{ group.title }}</p>
+        <ul class="kc-nav-links kc-nav-links-compact">
+          {% for link in group.links %}
+            <li class="kc-nav-link-row">
+              <a class="kc-nav-link kc-nav-link-external" href="{{ link.url }}"
+                 target="_blank" rel="noopener"
+                 data-kc-label="{{ link.label|lower }}">
+                <span class="kc-nav-link-label">{{ link.label }}</span>
+                {% include "admin/_icon.html" with name="external" extra_class="kc-nav-ext-icon" %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endfor %}
+    </details>
+
+    <p class="kc-nav-empty" id="kc-nav-empty" hidden>{% translate "No menu items match." %}</p>
+  </div>
+
+  <div class="kc-sidebar-foot">
+    <div class="kc-sidebar-user" title="{{ request.user.get_username }}">
+      <span class="kc-sidebar-avatar">{{ request.user.get_short_name|default:request.user.get_username|slice:":1"|upper }}</span>
+      <span class="kc-sidebar-user-meta">
+        <strong>{{ request.user.get_short_name|default:request.user.get_username }}</strong>
+        <small>
+          {% if request.user.is_superuser %}{% translate "Superuser" %}
+          {% elif request.user.is_staff %}{% translate "Staff" %}
+          {% else %}{{ request.user.get_username }}{% endif %}
+        </small>
+      </span>
+    </div>
+    <a class="kc-sidebar-view-site" href="{{ site_url|default:'/' }}" target="_blank" rel="noopener">
+      {% include "admin/_icon.html" with name="globe" %}
+      <span>{% translate "View site" %}</span>
+    </a>
+  </div>
+</nav>

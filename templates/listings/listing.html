@@ -1,0 +1,1705 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ listing.title }} | {{ site_name }}{% endblock %}
+
+{% block meta_description %}{{ listing.title }} in {{ listing.city }}, {{ listing.state }}. Price: Ksh {{ listing.price|intcomma }}. View photos, map, and book a viewing on {{ site_name }}.{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ listing.title }} | {{ site_name }}{% endblock %}
+{% block og_description %}{{ listing.description|truncatewords:30 }}{% endblock %}
+{% block og_image %}{{ site_url }}{{ listing.photo_main.url }}{% endblock %}
+{% block og_url %}{{ canonical_url }}{% endblock %}
+{% block twitter_image %}{{ site_url }}{{ listing.photo_main.url }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/listing-detail.css' %}">
+  <link rel="stylesheet" href="{% static 'css/verified-badge.css' %}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+{% endblock %}
+
+{% block extra_js %}
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="{% static 'js/listing-gallery.js' %}"></script>
+  <script src="{% static 'js/listing-map.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var inquiryModal = document.getElementById('inquiryModal');
+      var inquiryBtn = document.querySelector('.listing-inquiry-btn');
+      if (!inquiryModal) return;
+
+      // Move the modal to <body> so it can never be trapped inside a
+      // positioned/transformed ancestor (which breaks position: fixed and
+      // can leave the modal unclickable behind the backdrop).
+      if (inquiryModal.parentNode !== document.body) {
+        document.body.appendChild(inquiryModal);
+      }
+
+      function liftModalAboveBackdrop() {
+        // Force correct stacking with inline styles so it wins even if an old
+        // cached stylesheet pushed the backdrop above the modal.
+        inquiryModal.style.zIndex = '100050';
+        var backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(function (bd) {
+          bd.style.zIndex = '100040';
+        });
+      }
+
+      function showInquiryModal() {
+        if (window.jQuery && window.jQuery.fn && window.jQuery.fn.modal) {
+          window.jQuery(inquiryModal)
+            .one('shown.bs.modal', liftModalAboveBackdrop)
+            .modal('show');
+        } else if (window.bootstrap && window.bootstrap.Modal) {
+          var Ctor = window.bootstrap.Modal;
+          var instance = Ctor.getOrCreateInstance
+            ? Ctor.getOrCreateInstance(inquiryModal)
+            : new Ctor(inquiryModal);
+          instance.show();
+        }
+        // Run immediately too (covers the no-animation / instant-show case).
+        setTimeout(liftModalAboveBackdrop, 0);
+        setTimeout(liftModalAboveBackdrop, 250);
+      }
+
+      if (inquiryBtn) {
+        inquiryBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          showInquiryModal();
+        });
+      }
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --brand-blue: #10284e;
+    --brand-green: #30caa0;
+    --brand-green-light: #4dd4b0;
+    --brand-green-dark: #28b894;
+    --text-dark: #2c3e50;
+    --text-light: #7f8c8d;
+    --bg-light: #f8f9fa;
+    --white: #ffffff;
+    --shadow: 0 8px 32px rgba(16, 40, 78, 0.12);
+    --shadow-hover: 0 16px 48px rgba(16, 40, 78, 0.18);
+  }
+
+  .listing-hero {
+    background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-green) 100%);
+    min-height: 40vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .listing-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('{% static "img/building.jpg" %}') center/cover;
+    opacity: 0.1;
+    z-index: 1;
+  }
+
+  .listing-hero-content {
+    position: relative;
+    z-index: 2;
+    color: var(--white);
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+
+  .listing-hero-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    letter-spacing: -1px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+
+  .listing-hero-location {
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .listing-hero-price {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: inline-block;
+    border: 2px solid rgba(255,255,255,0.2);
+  }
+
+  .back-to-listings-btn {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    color: var(--white);
+    border: 2px solid rgba(255,255,255,0.2);
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    z-index: 3;
+  }
+
+  .back-to-listings-btn:hover {
+    background: rgba(255,255,255,0.25);
+    color: var(--white);
+    transform: translateY(-2px);
+  }
+
+  .listing-main-content {
+    padding: 3rem 0;
+    background: var(--bg-light);
+  }
+
+  .listing-image-gallery {
+    background: var(--white);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .listing-main-image {
+    width: 100%;
+    height: 500px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .listing-main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .listing-main-image:hover img {
+    transform: scale(1.05);
+  }
+
+  .listing-main-image::after {
+    content: '🔍';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .listing-main-image:hover::after {
+    opacity: 1;
+  }
+
+  .listing-main-image a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+  }
+
+  .listing-price-overlay {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
+    color: var(--white);
+    padding: 1rem 2rem;
+    border-radius: 20px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    box-shadow: 0 8px 32px rgba(48, 202, 160, 0.3);
+    backdrop-filter: blur(10px);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .listing-thumbnails {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--brand-green) transparent;
+  }
+
+  .listing-thumbnail {
+    flex: 0 0 120px;
+    height: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    position: relative;
+  }
+
+  .listing-thumbnail:hover {
+    transform: translateY(-4px);
+    border-color: var(--brand-green);
+    box-shadow: 0 8px 24px rgba(48, 202, 160, 0.2);
+  }
+
+  .listing-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .listing-thumbnail::after {
+    content: '🔍';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .listing-thumbnail:hover::after {
+    opacity: 1;
+  }
+
+  .listing-thumbnail a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+  }
+
+  /* Custom Lightbox Styling */
+  .lb-outerContainer {
+    border-radius: 16px !important;
+    box-shadow: 0 20px 60px rgba(16, 40, 78, 0.3) !important;
+  }
+
+  .lb-dataContainer {
+    border-radius: 0 0 16px 16px !important;
+    background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-green) 100%) !important;
+  }
+
+  .lb-data .lb-caption {
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+  }
+
+  .lb-data .lb-number {
+    color: rgba(255,255,255,0.8) !important;
+    font-weight: 500 !important;
+  }
+
+  .lb-nav a.lb-prev,
+  .lb-nav a.lb-next {
+    opacity: 0.8 !important;
+    transition: opacity 0.3s ease !important;
+  }
+
+  .lb-nav a.lb-prev:hover,
+  .lb-nav a.lb-next:hover {
+    opacity: 1 !important;
+  }
+
+  .lb-closeContainer .lb-close {
+    background: rgba(255,255,255,0.9) !important;
+    border-radius: 50% !important;
+    color: var(--brand-blue) !important;
+    font-weight: bold !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .lb-closeContainer .lb-close:hover {
+    background: white !important;
+    transform: scale(1.1) !important;
+  }
+
+  .lb-loader {
+    border: 3px solid var(--brand-green) !important;
+    border-top: 3px solid transparent !important;
+  }
+
+  .listing-details-card {
+    background: var(--white);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .listing-details-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--brand-blue);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .listing-details-title i {
+    color: var(--brand-green);
+    font-size: 1.5rem;
+  }
+
+  .listing-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .listing-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-light);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .listing-detail-item:hover {
+    background: linear-gradient(135deg, rgba(48, 202, 160, 0.1) 0%, rgba(40, 134, 107, 0.1) 100%);
+    transform: translateY(-2px);
+  }
+
+  .listing-detail-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 1.2rem;
+  }
+
+  .listing-detail-content {
+    flex: 1;
+  }
+
+  .listing-detail-label {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.2rem;
+  }
+
+  .listing-detail-value {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    font-weight: 700;
+  }
+
+  .listing-description-card {
+    background: var(--white);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .listing-description-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--brand-blue);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .listing-description-title i {
+    color: var(--brand-green);
+    font-size: 1.5rem;
+  }
+
+  .listing-description-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-dark);
+    background: var(--bg-light);
+    padding: 2rem;
+    border-radius: 16px;
+    border-left: 4px solid var(--brand-green);
+  }
+
+  .listing-sidebar {
+    position: sticky;
+    top: 2rem;
+  }
+
+  .listing-realtor-card {
+    background: var(--white);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .listing-realtor-card:hover {
+    border-color: var(--brand-green);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .listing-realtor-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 1.5rem;
+    border: 4px solid var(--brand-green);
+    box-shadow: 0 8px 24px rgba(48, 202, 160, 0.2);
+  }
+
+  .listing-realtor-name {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--brand-blue);
+    margin-bottom: 0.5rem;
+  }
+
+  .listing-realtor-title {
+    color: var(--text-light);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+
+  .listing-inquiry-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
+    color: var(--white);
+    border: none;
+    padding: 1.2rem 2rem;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(48, 202, 160, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .listing-inquiry-btn:hover {
+    background: linear-gradient(135deg, var(--brand-green-dark) 0%, var(--brand-green) 100%);
+    color: var(--white);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(48, 202, 160, 0.4);
+  }
+
+  .listing-inquiry-btn i {
+    font-size: 1.2rem;
+  }
+
+  .listing-contact-info {
+    background: var(--white);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+
+  .listing-contact-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--brand-blue);
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .listing-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .listing-contact-item:last-child {
+    border-bottom: none;
+  }
+
+  .listing-contact-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 1rem;
+  }
+
+  .listing-contact-text {
+    color: var(--text-dark);
+    font-weight: 500;
+  }
+
+  @media (max-width: 1200px) {
+    .listing-hero-title {
+      font-size: 2.4rem;
+    }
+    
+    .listing-main-image {
+      height: 400px;
+    }
+    
+    .listing-details-grid {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .listing-hero {
+      min-height: 30vh;
+    }
+    
+    .listing-hero-title {
+      font-size: 2rem;
+    }
+    
+    .listing-hero-content {
+      padding: 2rem 1rem;
+    }
+    
+    .back-to-listings-btn {
+      position: relative;
+      top: auto;
+      left: auto;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+    
+    .listing-main-image {
+      height: 300px;
+    }
+    
+    .listing-thumbnails {
+      padding: 1rem;
+    }
+    
+    .listing-thumbnail {
+      flex: 0 0 100px;
+      height: 70px;
+    }
+    
+    .listing-details-card,
+    .listing-description-card {
+      padding: 1.5rem;
+    }
+    
+    .listing-details-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    .listing-detail-item {
+      padding: 0.8rem;
+    }
+    
+    .listing-detail-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .listing-hero-title {
+      font-size: 1.8rem;
+    }
+    
+    .listing-hero-price {
+      font-size: 1.2rem;
+      padding: 0.8rem 1.5rem;
+    }
+    
+    .listing-main-image {
+      height: 250px;
+    }
+    
+    .listing-price-overlay {
+      top: 1rem;
+      right: 1rem;
+      padding: 0.8rem 1.5rem;
+      font-size: 1.1rem;
+    }
+    
+    .listing-details-card,
+    .listing-description-card {
+      padding: 1rem;
+    }
+    
+    .listing-description-text {
+      padding: 1.5rem;
+      font-size: 1rem;
+    }
+  }
+
+  /* Lightbox Custom Controls */
+  .lb-close {
+    position: absolute !important;
+    top: 16px !important;
+    right: 16px !important;
+    background: #fff !important;
+    color: #10284e !important;
+    border-radius: 50% !important;
+    font-size: 1.5rem !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 8px rgba(16,40,78,0.15) !important;
+    z-index: 9999 !important;
+    cursor: pointer !important;
+  }
+  .lb-nav a.lb-prev, .lb-nav a.lb-next {
+    background: rgba(48,202,160,0.8) !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.5rem !important;
+    z-index: 9999 !important;
+    transition: background 0.2s;
+  }
+  .lb-nav a.lb-prev:hover, .lb-nav a.lb-next:hover {
+    background: #30caa0 !important;
+  }
+</style>
+
+<!-- Add property-specific structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RealEstateListing",
+  "name": "{{ listing.title }}",
+  "description": "{{ listing.description|truncatewords:25 }}",
+  "url": "{{ request.build_absolute_uri }}",
+  "price": "{{ listing.price }}",
+  "priceCurrency": "KES",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "{{ listing.city }}",
+    "addressRegion": "{{ listing.state }}",
+    "addressCountry": "Kenya"
+  }
+}
+</script>
+
+<!-- Hero Section -->
+<section class="listing-hero">
+  <a href="{% url 'listings' %}" class="back-to-listings-btn d-none d-md-block">
+    <i class="fas fa-arrow-left"></i> Back to Listings
+  </a>
+  
+  <div class="listing-hero-content">
+    <h1 class="listing-hero-title">{{ listing.title }}</h1>
+    <div class="listing-hero-location">
+      <i class="fas fa-map-marker-alt"></i>
+      <span>{{ listing.city }}, {{ listing.state }} {{ listing.zipcode }}</span>
+    </div>
+    <div class="listing-hero-price">
+      Ksh {{ listing.price|intcomma }}
+    </div>
+  </div>
+</section>
+
+<!-- Breadcrumb -->
+<section id="bc" class="mt-3">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{% url 'index' %}">
+            <i class="fas fa-home"></i> Home</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="{% url 'listings' %}">Listings</a>
+        </li>
+        {% if listing.slug %}
+          <li class="breadcrumb-item active">{{ listing.title }}</li>
+        {% endif %}
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- Alerts -->
+{% include 'partials/_alerts.html' %}
+
+<!-- Main Content -->
+<section class="listing-main-content">
+  <div class="container">
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Image Gallery -->
+        <div class="listing-image-gallery">
+          <div class="listing-main-image" data-gallery-open data-gallery-index="0" role="button" tabindex="0" aria-label="Open photo gallery">
+            <img src="{{ listing.photo_main.url }}" alt="{{ listing.title }}" id="mainImage">
+            <span class="gallery-open-hint"><i class="fas fa-expand"></i> View photos</span>
+            <div class="listing-price-overlay">
+              Ksh {{ listing.price|intcomma }}
+            </div>
+          </div>
+
+          {% if listing.photo_1 or listing.photo_2 or listing.photo_3 or listing.photo_4 or listing.photo_5 or listing.photo_6 %}
+            <div class="listing-thumbnails">
+              <div class="listing-thumbnail active-thumb" data-gallery-index="0">
+                <img src="{{ listing.photo_main.url }}" alt="Main Image">
+              </div>
+              {% if listing.photo_1 %}
+                <div class="listing-thumbnail" data-gallery-index="1">
+                  <img src="{{ listing.photo_1.url }}" alt="Image 1">
+                </div>
+              {% endif %}
+              {% if listing.photo_2 %}
+                <div class="listing-thumbnail" data-gallery-index="2">
+                  <img src="{{ listing.photo_2.url }}" alt="Image 2">
+                </div>
+              {% endif %}
+              {% if listing.photo_3 %}
+                <div class="listing-thumbnail" data-gallery-index="3">
+                  <img src="{{ listing.photo_3.url }}" alt="Image 3">
+                </div>
+              {% endif %}
+              {% if listing.photo_4 %}
+                <div class="listing-thumbnail" data-gallery-index="4">
+                  <img src="{{ listing.photo_4.url }}" alt="Image 4">
+                </div>
+              {% endif %}
+              {% if listing.photo_5 %}
+                <div class="listing-thumbnail" data-gallery-index="5">
+                  <img src="{{ listing.photo_5.url }}" alt="Image 5">
+                </div>
+              {% endif %}
+              {% if listing.photo_6 %}
+                <div class="listing-thumbnail" data-gallery-index="6">
+                  <img src="{{ listing.photo_6.url }}" alt="Image 6">
+                </div>
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="listing-thumbnails">
+              <div class="listing-thumbnail active-thumb" data-gallery-index="0">
+                <img src="{{ listing.photo_main.url }}" alt="Main Image">
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <div id="listingGalleryData" hidden
+             data-title="{{ listing.title|escape }}"
+             data-images='[{% if listing.photo_main %}"{{ listing.photo_main.url }}"{% endif %}{% if listing.photo_1 %},"{{ listing.photo_1.url }}"{% endif %}{% if listing.photo_2 %},"{{ listing.photo_2.url }}"{% endif %}{% if listing.photo_3 %},"{{ listing.photo_3.url }}"{% endif %}{% if listing.photo_4 %},"{{ listing.photo_4.url }}"{% endif %}{% if listing.photo_5 %},"{{ listing.photo_5.url }}"{% endif %}{% if listing.photo_6 %},"{{ listing.photo_6.url }}"{% endif %}]'>
+        </div>
+
+        <!-- Property Details -->
+        <div class="listing-details-card">
+          <h2 class="listing-details-title">
+            <i class="fas fa-info-circle"></i>
+            Property Details
+          </h2>
+          <div class="listing-details-grid">
+            <div class="listing-detail-item">
+              <div class="listing-detail-icon">
+                <i class="fas fa-money-bill-wave"></i>
+              </div>
+              <div class="listing-detail-content">
+                <div class="listing-detail-label">Asking Price</div>
+                <div class="listing-detail-value">Ksh {{ listing.price|intcomma }}</div>
+              </div>
+            </div>
+            
+            <div class="listing-detail-item">
+              <div class="listing-detail-icon">
+                <i class="fas fa-bed"></i>
+              </div>
+              <div class="listing-detail-content">
+                <div class="listing-detail-label">Bedrooms</div>
+                <div class="listing-detail-value">{{ listing.bedrooms }}</div>
+              </div>
+            </div>
+            
+            <div class="listing-detail-item">
+              <div class="listing-detail-icon">
+                <i class="fas fa-bath"></i>
+              </div>
+              <div class="listing-detail-content">
+                <div class="listing-detail-label">Bathrooms</div>
+                <div class="listing-detail-value">{{ listing.bathrooms }}</div>
+              </div>
+            </div>
+            
+            <div class="listing-detail-item">
+              <div class="listing-detail-icon">
+                <i class="fas fa-car"></i>
+              </div>
+              <div class="listing-detail-content">
+                <div class="listing-detail-label">Garage</div>
+                <div class="listing-detail-value">{{ listing.garage }}</div>
+              </div>
+            </div>
+            
+            <div class="listing-detail-item">
+              <div class="listing-detail-icon">
+                <i class="fas fa-th-large"></i>
+              </div>
+              <div class="listing-detail-content">
+                <div class="listing-detail-label">Square Feet</div>
+                <div class="listing-detail-value">{{ listing.sqft }}</div>
+              </div>
+            </div>
+            
+            <div class="listing-detail-item">
+              <div class="listing-detail-icon">
+                <i class="fas fa-square"></i>
+              </div>
+              <div class="listing-detail-content">
+                <div class="listing-detail-label">Lot Size</div>
+                <div class="listing-detail-value">{{ listing.lot_size }} Acres</div>
+              </div>
+            </div>
+            
+            <div class="listing-detail-item">
+              <div class="listing-detail-icon">
+                <i class="fas fa-calendar-alt"></i>
+              </div>
+              <div class="listing-detail-content">
+                <div class="listing-detail-label">Listed Date</div>
+                <div class="listing-detail-value">{{ listing.list_date|date:"M d, Y" }}</div>
+              </div>
+            </div>
+            
+            <div class="listing-detail-item">
+              <div class="listing-detail-icon">
+                <i class="fas fa-user-tie"></i>
+              </div>
+              <div class="listing-detail-content">
+                <div class="listing-detail-label">Realtor</div>
+                <div class="listing-detail-value">{{ listing.realtor }}</div>
+              </div>
+            </div>
+          </div>
+          {% if listing.amenities %}
+          <div class="mt-4">
+            <h4 class="fw-bold"><i class="fas fa-school"></i> Amenities Nearby</h4>
+            <ul>
+              {% for amenity in listing.amenities %}
+                <li>{{ amenity }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Property Description -->
+        <div class="listing-description-card">
+          <h2 class="listing-description-title">
+            <i class="fas fa-file-alt"></i>
+            Property Description
+          </h2>
+          
+          <div class="listing-description-text">
+            {{ listing.description }}
+          </div>
+        </div>
+
+        <!-- Testimonials Section -->
+        <div class="listing-testimonials-section mt-5">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3><i class="fas fa-star"></i> Client Reviews</h3>
+            {% if user.is_authenticated %}
+              <a href="{% url 'testimonials:add_testimonial' listing.slug %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Write Review
+              </a>
+            {% endif %}
+          </div>
+          
+          {% with approved_testimonials=listing.testimonials.all %}
+            {% if approved_testimonials %}
+              <div class="row">
+                {% for testimonial in approved_testimonials %}
+                  {% if testimonial.status == 'approved' %}
+                  <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                          <h6 class="card-title">{{ testimonial.title }}</h6>
+                          <div class="text-nowrap">
+                            {% for star in testimonial.get_filled_stars %}
+                              <i class="fas fa-star text-warning"></i>
+                            {% endfor %}
+                            {% for star in testimonial.get_empty_stars %}
+                              <i class="far fa-star text-warning"></i>
+                            {% endfor %}
+                          </div>
+                        </div>
+                        <p class="card-text">{{ testimonial.content|truncatewords:15 }}</p>
+                        <footer class="blockquote-footer">
+                          <cite>{{ testimonial.name }}</cite>
+                          <small class="text-muted">{{ testimonial.created_at|date:"M d, Y" }}</small>
+                        </footer>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              
+              <div class="text-center mt-3">
+                <a href="{% url 'testimonials:listing_testimonials' listing.slug %}" class="btn btn-outline-primary">
+                  View All {{ approved_testimonials.count }} Reviews
+                </a>
+              </div>
+            {% else %}
+              <div class="alert alert-info">
+                <h5>No reviews yet</h5>
+                <p>Be the first to review this property!</p>
+                {% if user.is_authenticated %}
+                  <a href="{% url 'testimonials:add_testimonial' listing.slug %}" class="btn btn-primary">
+                    <i class="fas fa-star"></i> Write First Review
+                  </a>
+                {% else %}
+                  <p><a href="{% url 'login' %}">Login</a> to write a review.</p>
+                {% endif %}
+              </div>
+            {% endif %}
+          {% endwith %}
+        </div>
+
+        <!-- Map Section -->
+        <div class="listing-map-card">
+          <h4><i class="fas fa-map-marker-alt"></i> Location Map</h4>
+          <p class="listing-map-address">{{ listing.address }}, {{ listing.city }}, {{ listing.state }} {{ listing.zipcode }}</p>
+          <div id="listingMap"
+               data-lat="{{ listing.latitude|default:'' }}"
+               data-lng="{{ listing.longitude|default:'' }}"
+               data-address="{{ listing.address }}, {{ listing.city }}, {{ listing.state }}, Kenya"
+               data-title="{{ listing.title|escape }}">
+            <div class="listing-map-loading"><i class="fas fa-spinner fa-spin"></i> Loading map…</div>
+          </div>
+        </div>
+
+        <!-- Booking Form -->
+        <div class="listing-details-card mt-4">
+          <h2 class="listing-details-title">
+            <i class="fas fa-calendar-check"></i>
+            Book a Viewing with {{ listing.realtor }}
+          </h2>
+          
+          {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'listing_booking' listing.id %}" id="bookingForm">
+              {% csrf_token %}
+              
+              {% if listing.property_type == 'airbnb' %}
+                <!-- Airbnb Booking Form -->
+                <div class="row g-3">
+                  <div class="col-12">
+                    <h5>Book Your Stay</h5>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="check_in_date" class="form-label">Check-in Date</label>
+                    <input type="date" name="check_in_date" id="check_in_date" class="form-control" required min="{{ today|date:'Y-m-d' }}">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="check_out_date" class="form-label">Check-out Date</label>
+                    <input type="date" name="check_out_date" id="check_out_date" class="form-control" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="check_in_time" class="form-label">Check-in Time</label>
+                    <select name="check_in_time" id="check_in_time" class="form-control" required>
+                      <option value="14:00">2:00 PM</option>
+                      <option value="15:00" selected>3:00 PM (Standard)</option>
+                      <option value="16:00">4:00 PM</option>
+                      <option value="17:00">5:00 PM</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="check_out_time" class="form-label">Check-out Time</label>
+                    <select name="check_out_time" id="check_out_time" class="form-control" required>
+                      <option value="10:00">10:00 AM</option>
+                      <option value="11:00" selected>11:00 AM (Standard)</option>
+                      <option value="12:00">12:00 PM</option>
+                    </select>
+                  </div>
+                  <!-- Contact fields -->
+                  <div class="col-md-6">
+                    <label for="client_email" class="form-label">Your Email</label>
+                    <input type="email" name="client_email" id="client_email" class="form-control" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="client_phone" class="form-label">Your Phone</label>
+                    <input type="tel" name="client_phone" id="client_phone" class="form-control" required>
+                  </div>
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Book Now</button>
+                  </div>
+                </div>
+              {% else %}
+                <!-- Regular Viewing Booking Form -->
+                <div class="row g-3">
+                  <div class="col-12">
+                    <h5>Schedule a Viewing</h5>
+                  </div>
+                  <!-- Existing booking form for sale/rent -->
+                  <div class="col-md-6">
+                    <label for="booking_date" class="form-label">Select Date</label>
+                    <input type="date" name="date" id="booking_date" class="form-control" required min="{{ today|date:'Y-m-d' }}">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="booking_time" class="form-label">Available Times</label>
+                    <select name="time" id="booking_time" class="form-control" required disabled>
+                      <option value="">Select a date first</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="client_email" class="form-label">Your Email</label>
+                    <input type="email" name="client_email" id="client_email" class="form-control" 
+                           value="{% if user.email %}{{ user.email }}{% endif %}" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="client_phone" class="form-label">Your Phone Number</label>
+                    <input type="tel" name="client_phone" id="client_phone" class="form-control" 
+                           placeholder="e.g., +254 700 123 456" required>
+                  </div>
+                  <div class="col-12">
+                    <button type="submit" id="bookingSubmit" class="btn btn-success">
+                      <i class="fas fa-calendar-check"></i> Book Viewing
+                    </button>
+                  </div>
+                </div>
+              {% endif %}
+            </form>
+          {% else %}
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i>
+              Please <a href="{% url 'login' %}">login</a> to book a viewing.
+            </div>
+          {% endif %}
+          
+          <!-- Show existing bookings for this listing (for the current user) -->
+          {% if user.is_authenticated %}
+            {% with user_bookings=listing.bookings.all %}
+              {% if user_bookings %}
+                <div class="mt-4">
+                  <!-- Property Viewings -->
+                  {% with viewing_bookings=user_bookings %}
+                    {% if viewing_bookings %}
+                      <h5><i class="fas fa-eye"></i> Your Property Viewings:</h5>
+                      {% for booking in viewing_bookings %}
+                        {% if booking.client == user and booking.booking_type == 'viewing' %}
+                          <div class="alert alert-info">
+                            <i class="fas fa-calendar"></i>
+                            <strong>{{ booking.date }}</strong> at <strong>{{ booking.time }}</strong>
+                            - Status: <span class="badge bg-{{ booking.status|yesno:'success,warning' }}">{{ booking.get_status_display }}</span>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                  {% endwith %}
+
+                  <!-- Airbnb Bookings -->
+                  {% with airbnb_bookings=user_bookings %}
+                    {% if airbnb_bookings %}
+                      <h5 class="mt-3"><i class="fas fa-bed"></i> Your Airbnb Bookings:</h5>
+                      {% for booking in airbnb_bookings %}
+                        {% if booking.client == user and booking.booking_type == 'airbnb' %}
+                          <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>Check-in:</strong> {{ booking.check_in_date }} at {{ booking.check_in_time }}<br>
+                            <strong>Check-out:</strong> {{ booking.check_out_date }} at {{ booking.check_out_time }}<br>
+                            Status: <span class="badge bg-{{ booking.status|yesno:'success,warning' }}">{{ booking.get_status_display }}</span>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                  {% endwith %}
+                </div>
+              {% endif %}
+            {% endwith %}
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="listing-sidebar">
+          <!-- Realtor Card -->
+          <div class="listing-realtor-card">
+            <div class="listing-realtor-avatar">
+              <img src="{{ listing.realtor.photo.url }}" alt="{{ listing.realtor.name }}">
+            </div>
+            <div class="listing-realtor-name-row">
+              <h3 class="listing-realtor-name mb-0">{{ listing.realtor }}</h3>
+              {% if listing.realtor.is_verified %}
+                {% include 'partials/_verified_badge.html' %}
+              {% endif %}
+            </div>
+            <p class="listing-realtor-title">Property Realtor</p>
+            
+            <button type="button" class="listing-inquiry-btn">
+              <i class="fas fa-envelope"></i>
+              Make An Inquiry
+            </button>
+          </div>
+
+          <!-- Contact Information -->
+          <div class="listing-contact-info">
+            <h3 class="listing-contact-title">Contact Information</h3>
+            
+            <div class="listing-contact-item">
+              <div class="listing-contact-icon">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <div class="listing-contact-text">{{ listing.realtor.email }}</div>
+            </div>
+            
+            <div class="listing-contact-item">
+              <div class="listing-contact-icon">
+                <i class="fas fa-phone"></i>
+              </div>
+              <div class="listing-contact-text">{{ listing.realtor.phone }}</div>
+            </div>
+            
+            <div class="listing-contact-item">
+              <div class="listing-contact-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div class="listing-contact-text">{{ listing.address }}, {{ listing.city }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Related Listings Section -->
+{% if related_listings %}
+<section class="related-listings-section">
+  <div class="container">
+    <div class="related-listings-header">
+      <h2 class="related-listings-title">
+        <i class="fas fa-home"></i>
+        Similar Properties You Might Like
+      </h2>
+      <p class="related-listings-subtitle">
+        Discover more properties in {{ listing.city }}, {{ listing.state }} and nearby areas
+      </p>
+    </div>
+    
+    <div class="related-listings-grid">
+      {% for related in related_listings %}
+        <div class="related-listing-card">
+          <div class="related-listing-image">
+            <img src="{{ related.photo_main.url }}" alt="{{ related.title }}">
+            <div class="related-listing-price">
+              Ksh {{ related.price|intcomma }}
+            </div>
+            {% if related.is_featured %}
+              <div class="related-listing-badge">Featured</div>
+            {% endif %}
+          </div>
+          
+          <div class="related-listing-content">
+            <h3 class="related-listing-title">{{ related.title }}</h3>
+            <div class="related-listing-location">
+              <i class="fas fa-map-marker-alt"></i>
+              {{ related.city }}, {{ related.state }}
+            </div>
+            
+            <div class="related-listing-features">
+              <div class="related-listing-feature">
+                <i class="fas fa-bed"></i>
+                <span>{{ related.bedrooms }}</span>
+              </div>
+              <div class="related-listing-feature">
+                <i class="fas fa-bath"></i>
+                <span>{{ related.bathrooms }}</span>
+              </div>
+              <div class="related-listing-feature">
+                <i class="fas fa-car"></i>
+                <span>{{ related.garage }}</span>
+              </div>
+              <div class="related-listing-feature">
+                <i class="fas fa-th-large"></i>
+                <span>{{ related.sqft }} sqft</span>
+              </div>
+            </div>
+            
+            <div class="related-listing-footer">
+              <div class="related-listing-realtor">
+                <i class="fas fa-user-tie"></i>
+                <span>{{ related.realtor }}</span>
+              </div>
+              {% if related.slug %}
+                <a href="{% url 'listing' related.slug %}" class="related-listing-btn">
+                  <i class="fas fa-eye"></i>
+                  View Details
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    
+    <div class="related-listings-cta">
+      <a href="{% url 'listings' %}" class="related-listings-view-all">
+        <i class="fas fa-th"></i>
+        View All Properties
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<style>
+.related-listings-section {
+  padding: 4rem 0;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.related-listings-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.related-listings-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--brand-blue);
+  margin-bottom: 1rem;
+}
+
+.related-listings-title i {
+  color: var(--brand-green);
+  margin-right: 0.5rem;
+}
+
+.related-listings-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-light);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.related-listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.related-listing-card {
+  background: var(--white);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.related-listing-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.related-listing-image {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.related-listing-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.related-listing-card:hover .related-listing-image img {
+  transform: scale(1.05);
+}
+
+.related-listing-price {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  border-radius: 15px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 15px rgba(48, 202, 160, 0.3);
+}
+
+.related-listing-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: var(--white);
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.related-listing-content {
+  padding: 1.5rem;
+}
+
+.related-listing-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--brand-blue);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.related-listing-location {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.related-listing-location i {
+  color: var(--brand-green);
+  margin-right: 0.5rem;
+}
+
+.related-listing-features {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.related-listing-feature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.8rem 0.5rem;
+  background: var(--bg-light);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.related-listing-feature:hover {
+  background: var(--brand-green);
+  color: var(--white);
+}
+
+.related-listing-feature i {
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+  color: var(--brand-green);
+}
+
+.related-listing-feature:hover i {
+  color: var(--white);
+}
+
+.related-listing-feature span {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.related-listing-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.related-listing-realtor {
+  display: flex;
+  align-items: center;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.related-listing-realtor i {
+  color: var(--brand-green);
+  margin-right: 0.5rem;
+}
+
+.related-listing-btn {
+  background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
+  color: var(--white);
+  padding: 0.6rem 1.2rem;
+  border-radius: 15px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.related-listing-btn:hover {
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(48, 202, 160, 0.3);
+}
+
+.related-listings-cta {
+  text-align: center;
+}
+
+.related-listings-view-all {
+  background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-green) 100%);
+  color: var(--white);
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.related-listings-view-all:hover {
+  color: var(--white);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .related-listings-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .related-listings-title {
+    font-size: 2rem;
+  }
+  
+  .related-listing-features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .related-listing-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .related-listing-btn {
+    justify-content: center;
+  }
+}
+</style>
+
+<!-- Inquiry Modal -->
+<div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 20px; border: none;">
+      <div class="modal-header" style="background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-green) 100%); color: white; border-radius: 20px 20px 0 0;">
+        <h5 class="modal-title" id="inquiryModalLabel">
+          <i class="fas fa-envelope"></i> Make An Inquiry
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.9; text-shadow: none;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-4">
+        <form action="{% url 'contact' %}" method="POST">
+          {% csrf_token %}
+          {% if user.is_authenticated %}
+            <input type="hidden" name="user_id" value="{{ user.id }}">
+          {% else %}
+            <input type="hidden" name="user_id" value="0">
+          {% endif %}
+          <input type="hidden" name="realtor_email" value="{{ listing.realtor.email }}">
+          <input type="hidden" name="listing_id" value="{{ listing.id }}">
+          
+          <div class="mb-3">
+            <label for="property_name" class="form-label fw-bold text-dark">Property:</label>
+            <input type="text" name="listing" class="form-control" value="{{ listing.title }}" readonly style="background-color: #f8f9fa;">
+          </div>
+          
+          <div class="mb-3">
+            <label for="name" class="form-label fw-bold text-dark">Name:</label>
+            <input type="text" name="name" class="form-control" {% if user.is_authenticated %} value="{{ user.first_name }} {{ user.last_name }}" {% endif %} required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="email" class="form-label fw-bold text-dark">Email:</label>
+            <input type="email" name="email" class="form-control" {% if user.is_authenticated %} value="{{ user.email }}" {% endif %} required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="phone" class="form-label fw-bold text-dark">Phone:</label>
+            <input type="text" name="phone" class="form-control">
+          </div>
+          
+          <div class="mb-4">
+            <label for="message" class="form-label fw-bold text-dark">Message:</label>
+            <textarea name="message" class="form-control" rows="4" placeholder="I'm interested in this property. Please contact me with more details."></textarea>
+          </div>
+          
+          <button type="submit" class="btn w-100" style="background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%); color: white; border-radius: 12px; padding: 12px; font-weight: 700;">
+            <i class="fas fa-paper-plane"></i> Send Inquiry
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Property Photo Gallery -->
+<div class="modal fade property-gallery-modal" id="propertyGalleryModal" tabindex="-1" aria-labelledby="propertyGalleryTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="property-gallery-toolbar">
+        <p class="property-gallery-title" id="propertyGalleryTitle">{{ listing.title }}</p>
+        <span class="property-gallery-counter" id="propertyGalleryCounter">1 / 1</span>
+        <button type="button" class="property-gallery-close" id="propertyGalleryClose" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close gallery">
+          <i class="fas fa-times"></i><span>Close</span>
+        </button>
+      </div>
+      <div class="property-gallery-stage">
+        <button type="button" class="property-gallery-nav prev" id="propertyGalleryPrev" aria-label="Previous photo">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <img id="propertyGalleryImage" class="property-gallery-image" src="" alt="">
+        <button type="button" class="property-gallery-nav next" id="propertyGalleryNext" aria-label="Next photo">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+      <div class="property-gallery-footer">Use arrow keys to browse · Press Esc to close</div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('booking_date');
+    const timeSelect = document.getElementById('booking_time');
+    const submitBtn = document.getElementById('bookingSubmit');
+    const checkInInput = document.getElementById('check_in_date');
+    const checkOutInput = document.getElementById('check_out_date');
+
+    if (dateInput) dateInput.setAttribute('min', today);
+    if (checkInInput) {
+        checkInInput.setAttribute('min', today);
+        checkInInput.addEventListener('change', function() {
+            if (!checkOutInput || !this.value) return;
+            const d = new Date(this.value);
+            d.setDate(d.getDate() + 1);
+            checkOutInput.setAttribute('min', d.toISOString().split('T')[0]);
+            if (checkOutInput.value && checkOutInput.value <= this.value) checkOutInput.value = '';
+        });
+    }
+    if (checkOutInput) checkOutInput.setAttribute('min', today);
+
+    if (dateInput && timeSelect) {
+        dateInput.addEventListener('change', function() {
+            const selectedDate = this.value;
+            if (!selectedDate) {
+                timeSelect.innerHTML = '<option value="">Select a date first</option>';
+                timeSelect.disabled = true;
+                if (submitBtn) submitBtn.disabled = true;
+                return;
+            }
+            fetch('/listings/api/available-times/{{ listing.id }}/?date=' + selectedDate)
+                .then(r => r.json())
+                .then(data => {
+                    timeSelect.innerHTML = '';
+                    if (data.available_times && data.available_times.length) {
+                        timeSelect.innerHTML = '<option value="">Select a time</option>';
+                        data.available_times.forEach(function(time) {
+                            const opt = document.createElement('option');
+                            opt.value = time;
+                            opt.textContent = time;
+                            timeSelect.appendChild(opt);
+                        });
+                        timeSelect.disabled = false;
+                    } else {
+                        timeSelect.innerHTML = '<option value="">No available times</option>';
+                        timeSelect.disabled = true;
+                    }
+                })
+                .catch(function() {
+                    timeSelect.innerHTML = '<option value="">Error loading times</option>';
+                    timeSelect.disabled = true;
+                });
+        });
+        timeSelect.addEventListener('change', function() {
+            if (submitBtn) submitBtn.disabled = !this.value;
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% load humanize %}
+
+<div class="listings-grid">
+  {% if listings %}
+    {% for listing in listings %}
+      <article class="listing-card">
+        <div class="listing-card-media">
+          <img src="{{ listing.photo_main.url }}" alt="{{ listing.title }}" loading="lazy">
+          <div class="listing-card-badges">
+            <span class="listing-type-badge type-{{ listing.property_type }}">
+              {% if listing.property_type == 'sale' %}
+                <i class="fas fa-tag"></i> For Sale
+              {% elif listing.property_type == 'rent' %}
+                <i class="fas fa-key"></i> For Rent
+              {% elif listing.property_type == 'airbnb' %}
+                <i class="fas fa-bed"></i> Airbnb
+              {% else %}
+                {{ listing.get_property_type_display }}
+              {% endif %}
+            </span>
+            <span class="listing-price-badge">Ksh {{ listing.price|intcomma }}</span>
+          </div>
+        </div>
+
+        <div class="listing-card-body">
+          <h3 class="listing-card-title">{{ listing.title }}</h3>
+          <p class="listing-card-location">
+            <i class="fas fa-map-marker-alt"></i>
+            {{ listing.city }}, {{ listing.state }}
+          </p>
+
+          <div class="listing-card-features">
+            <span class="listing-card-feature">
+              <i class="fas fa-bed"></i>{{ listing.bedrooms }} Bed{{ listing.bedrooms|pluralize }}
+            </span>
+            <span class="listing-card-feature">
+              <i class="fas fa-bath"></i>{{ listing.bathrooms }} Bath{{ listing.bathrooms|pluralize }}
+            </span>
+            {% if listing.sqft %}
+              <span class="listing-card-feature">
+                <i class="fas fa-ruler-combined"></i>{{ listing.sqft|intcomma }} sqft
+              </span>
+            {% endif %}
+            {% if listing.garage %}
+              <span class="listing-card-feature">
+                <i class="fas fa-car"></i>{{ listing.garage }} Garage
+              </span>
+            {% endif %}
+          </div>
+
+          <div class="listing-card-footer">
+            {% if listing.slug %}
+              <a href="{% url 'listing' listing.slug %}" class="listing-card-btn">
+                View Details <i class="fas fa-arrow-right"></i>
+              </a>
+            {% else %}
+              <span class="listing-card-btn disabled">Details Unavailable</span>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+    {% endfor %}
+  {% else %}
+    <div class="listings-empty">
+      <i class="fas fa-home"></i>
+      <h4>No Properties Available</h4>
+      <p>We couldn't find any properties matching your criteria. Try adjusting your filters.</p>
+    </div>
+  {% endif %}
+</div>
+
+{% if listings.has_other_pages %}
+  <nav aria-label="Listings pagination" class="listings-pagination">
+    <ul class="pagination justify-content-center">
+      {% if listings.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ listings.previous_page_number }}" aria-label="Previous">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+        </li>
+      {% endif %}
+
+      {% for i in listings.paginator.page_range %}
+        {% if listings.number == i %}
+          <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+      {% endfor %}
+
+      {% if listings.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ listings.next_page_number }}" aria-label="Next">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

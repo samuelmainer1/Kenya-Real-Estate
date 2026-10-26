@@ -1,0 +1,47 @@
+.field-content textarea {
+    height: 400px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.legal-help {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-left: 4px solid #007cba;
+}
+
+.legal-help h4 {
+    margin-top: 0;
+    color: #007cba;
+}
+
+.legal-help ul {
+    margin-bottom: 0;
+}
+
+.seo-preview {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.seo-title {
+    color: #1a0dab;
+    font-size: 18px;
+    text-decoration: none;
+    font-family: arial, sans-serif;
+}
+
+.seo-url {
+    color: #006621;
+    font-size: 14px;
+}
+
+.seo-description {
+    color: #545454;
+    font-size: 13px;
+    line-height: 1.4;
+}

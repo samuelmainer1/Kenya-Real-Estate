@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile | {{ site_name }}{% endblock %}
+{% block meta_description %}Update the name and email attached to your account.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/client-dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="cdash">
+  <div class="cdash-wrap">
+
+    <div class="cdash-hero">
+      <div>
+        <h1>My profile</h1>
+        <p>Keep your contact details current so we can reach you about viewings and stays.</p>
+      </div>
+      <div class="cdash-hero-actions">
+        <a class="cdash-pill" href="{% url 'dashboard' %}">
+          <i class="fas fa-arrow-left"></i> Back to dashboard
+        </a>
+      </div>
+    </div>
+
+    <div class="cdash-grid" style="margin-top: 1.25rem;">
+
+      <div class="cdash-panel">
+        <div class="cdash-panel-head">
+          <h2><i class="fas fa-user-edit"></i> Account details</h2>
+        </div>
+        <div class="cdash-panel-body" style="padding: 1.1rem;">
+          <form method="post" action="{% url 'profile' %}">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label for="id_first_name" style="display:block;font-size:.8rem;font-weight:700;color:#10284e;margin-bottom:.3rem;">First name</label>
+              <input type="text" class="form-control" id="id_first_name" name="first_name"
+                     value="{{ user.first_name }}" maxlength="150" autocomplete="given-name">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label for="id_last_name" style="display:block;font-size:.8rem;font-weight:700;color:#10284e;margin-bottom:.3rem;">Last name</label>
+              <input type="text" class="form-control" id="id_last_name" name="last_name"
+                     value="{{ user.last_name }}" maxlength="150" autocomplete="family-name">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label for="id_email" style="display:block;font-size:.8rem;font-weight:700;color:#10284e;margin-bottom:.3rem;">Email address</label>
+              <input type="email" class="form-control" id="id_email" name="email"
+                     value="{{ user.email }}" maxlength="254" autocomplete="email">
+              <small class="cdash-muted">We use this for booking confirmations and replies.</small>
+            </div>
+
+            <button type="submit" class="cdash-pill cdash-pill-solid" style="border:none;cursor:pointer;">
+              <i class="fas fa-save"></i> Save changes
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="cdash-panel">
+        <div class="cdash-panel-head">
+          <h2><i class="fas fa-shield-alt"></i> Account</h2>
+        </div>
+        <div class="cdash-panel-body">
+          <table class="cdash-mini">
+            <tbody>
+              <tr>
+                <th scope="row">Username</th>
+                <td>{{ user.username }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Member since</th>
+                <td>{{ user.date_joined|date:"j F Y" }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Last login</th>
+                <td>{{ user.last_login|date:"j F Y, H:i"|default:"—" }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="cdash-empty" style="padding-top: 1rem;">
+            <p>Need to change your password or username? Contact us and we will help.</p>
+            <a class="cdash-pill" href="{% url 'contact' %}">Contact support</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+/staticfiles
+/venv
+venv/
+.vscode
+
+# Local database contains user accounts and password hashes.
+db.sqlite3
+*.sqlite3
+
+# Local login notes.
+btre/CREDENTIALS.md
+

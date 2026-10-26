@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <title>{% block title %}{{ site_name }} | {{ site_tagline }}{% endblock %}</title>
+  <meta name="title" content="{% block meta_title %}{{ site_name }} | {{ site_tagline }}{% endblock %}">
+  {% comment %}
+    Single source of truth for the description / keywords / robots tags.
+    Page templates must override these blocks or the underlying variables -
+    never append their own <meta> tag through the generic "meta" block below,
+    otherwise the document ends up with two description tags and crawlers
+    have to guess which one wins.
+
+    Note: this must be a {% templatetag openblock %} comment {% templatetag closeblock %}
+    block, not a {# ... #} comment. Django's {# #} form only works on a single
+    line; a multi-line one is emitted as literal text into the page.
+  {% endcomment %}
+  <meta name="description" content="{% block meta_description %}{{ site_description }}{% endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}{{ site_keywords }}{% endblock %}">
+  <meta name="author" content="{{ site_name }}">
+  <meta name="robots" content="{% block robots %}index, follow, max-image-preview:large{% endblock %}">
+  <meta name="language" content="English">
+  <meta name="geo.region" content="KE">
+  <meta name="geo.placename" content="Nairobi, Kenya">
+  <meta name="theme-color" content="#10284e">
+
+  <link rel="canonical" href="{% block canonical_url %}{{ canonical_url }}{% endblock %}">
+  <link rel="icon" href="{% static 'img/favicon-192.png' %}" type="image/png">
+  <link rel="apple-touch-icon" href="{% static 'img/favicon-192.png' %}">
+  <link rel="manifest" href="{% static 'img/site.webmanifest' %}">
+
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:site_name" content="{{ site_name }}">
+  <meta property="og:locale" content="en_KE">
+  <meta property="og:title" content="{% block og_title %}{{ site_name }} | {{ site_tagline }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{{ site_description }}{% endblock %}">
+  <meta property="og:url" content="{% block og_url %}{{ canonical_url }}{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}{{ site_url }}{% static 'img/showcase.avif' %}{% endblock %}">
+
+  <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}">
+  <meta name="twitter:title" content="{% block twitter_title %}{{ site_name }} | {{ site_tagline }}{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}{{ site_description }}{% endblock %}">
+  <meta name="twitter:image" content="{% block twitter_image %}{{ site_url }}{% static 'img/showcase.avif' %}{% endblock %}">
+
+  {% block meta %}{% endblock %}
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "name": "{{ site_name|escapejs }}",
+    "url": "{{ site_url }}",
+    "description": "{{ site_description|escapejs }}",
+    "telephone": "+254722359298",
+    "email": "samuelmainer@gmail.com",
+    "founder": {
+      "@type": "Person",
+      "name": "Sam Maina",
+      "jobTitle": "Founder & CEO"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Kenya"
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Nextgen Mall, Mombasa Road",
+      "addressLocality": "Nairobi",
+      "addressCountry": "KE"
+    }
+  }
+  </script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+  <link rel="stylesheet" href="{% static 'css/all.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/lightbox.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/cookie-consent.css' %}">
+  <link rel="stylesheet" href="{% static 'css/announcement.css' %}">
+  {% block extra_css %}{% endblock %}
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+  {% comment %}
+    Optional site-wide announcement, edited in the Control Centre. Rendered
+    outside <header> so it pushes the sticky navbar down instead of overlapping
+    it. Hidden entirely unless an admin has both written text and ticked
+    "active" in Site settings.
+  {% endcomment %}
+  {% if site_announcement %}
+    <div class="site-announcement" role="status">
+      <div class="container site-announcement-inner">
+        <i class="fas fa-bullhorn" aria-hidden="true"></i>
+        <span>{{ site_announcement }}</span>
+      </div>
+    </div>
+  {% endif %}
+
+  <header class="site-header" id="site-header">
+    {% include 'partials/_topbar.html' %}
+    {% include 'partials/_navbar.html' %}
+  </header>
+
+  <main id="main-content" role="main">
+    {% comment %}
+      Flash messages live here so every page shows them - previously only the
+      login page included the alerts partial, so the "booking cancelled" and
+      "profile updated" confirmations redirected to a page that silently
+      dropped them.
+
+      Inside `.cdash` the dashboard supplies its own centred wrapper, so the
+      partial's `.container` would double up; those views set
+      `full_bleed_alerts=True` and the partial drops it.
+    {% endcomment %}
+    {% if full_bleed_alerts %}
+      {% include 'partials/_alerts.html' with bare=True %}
+    {% else %}
+      {% include 'partials/_alerts.html' %}
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+
+
+
+  {% include 'partials/_footer.html' %}
+  {% include 'partials/_whatsapp_chatbot.html' %}
+
+  <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/lightbox.min.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

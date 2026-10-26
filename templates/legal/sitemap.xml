@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <!-- Static Pages -->
+  {% for url in static_urls %}
+  <url>
+    <loc>{{ origin }}{{ url.url }}</loc>
+    <changefreq>{{ url.changefreq }}</changefreq>
+    <priority>{{ url.priority }}</priority>
+  </url>
+  {% endfor %}
+
+  <!-- Listings (with the main photo so Google Images can index them) -->
+  {% for listing in listings %}
+  <url>
+    <loc>{{ origin }}/listings/{{ listing.slug }}/</loc>
+    {% if listing.list_date %}<lastmod>{{ listing.list_date|date:'c' }}</lastmod>{% endif %}
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    {% if listing.image_url %}
+    <image:image>
+      <image:loc>{{ origin }}{{ listing.image_url }}</image:loc>
+      <image:title>{{ listing.title|escape }}</image:title>
+    </image:image>
+    {% endif %}
+  </url>
+  {% endfor %}
+
+  <!-- Services -->
+  {% for service in services %}
+  <url>
+    <loc>{{ origin }}/services/{{ service.slug }}/</loc>
+    {% if service.updated_at %}<lastmod>{{ service.updated_at|date:'c' }}</lastmod>{% endif %}
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  {% endfor %}
+
+  <!-- Blog Posts -->
+  {% for blog in blogs %}
+  <url>
+    <loc>{{ origin }}/blog/{{ blog.slug }}/</loc>
+    {% if blog.posted_at %}<lastmod>{{ blog.posted_at|date:'c' }}</lastmod>{% endif %}
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  {% endfor %}
+
+  <!-- Legal Pages (canonical short URLs) -->
+  {% for legal in legal_entries %}
+  <url>
+    <loc>{{ origin }}{{ legal.url }}</loc>
+    {% if legal.last_modified %}<lastmod>{{ legal.last_modified|date:'c' }}</lastmod>{% endif %}
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  {% endfor %}
+
+  <!-- Custom URLs -->
+  {% for custom in custom_urls %}
+  <url>
+    <loc>{{ origin }}{{ custom.url }}</loc>
+    {% if custom.last_modified %}<lastmod>{{ custom.last_modified|date:'c' }}</lastmod>{% endif %}
+    <changefreq>{{ custom.changefreq }}</changefreq>
+    <priority>{{ custom.priority }}</priority>
+  </url>
+  {% endfor %}
+</urlset>

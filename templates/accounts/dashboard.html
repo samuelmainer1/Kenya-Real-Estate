@@ -1,0 +1,290 @@
+﻿{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}My Dashboard | {{ site_name }}{% endblock %}
+{% block meta_description %}Manage your property viewings, stays, inquiries and reviews in one place.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/client-dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="cdash">
+  <div class="cdash-wrap">
+
+    <div class="cdash-hero">
+      <div>
+        <h1>
+          {% if user.first_name %}Hello, {{ user.first_name }}{% else %}Welcome back{% endif %}
+        </h1>
+        <p>{{ today|date:"l, j F Y" }} &middot; Your viewings, stays and inquiries, all in one place.</p>
+      </div>
+      <div class="cdash-hero-actions">
+        <a class="cdash-pill cdash-pill-solid" href="{% url 'listings' %}">
+          <i class="fas fa-search"></i> Browse properties
+        </a>
+        <a class="cdash-pill" href="{% url 'profile' %}">
+          <i class="fas fa-user-cog"></i> Profile
+        </a>
+        <a class="cdash-pill" href="{% url 'logout' %}">
+          <i class="fas fa-sign-out-alt"></i> Log out
+        </a>
+      </div>
+    </div>
+
+    <div class="cdash-stats">
+      <div class="cdash-stat">
+        <span class="cdash-stat-label">Total bookings</span>
+        <span class="cdash-stat-value">{{ stats.total|default:0 }}</span>
+      </div>
+      <div class="cdash-stat cdash-stat-amber">
+        <span class="cdash-stat-label">Awaiting confirmation</span>
+        <span class="cdash-stat-value">{{ stats.pending|default:0 }}</span>
+      </div>
+      <div class="cdash-stat cdash-stat-emerald">
+        <span class="cdash-stat-label">Confirmed</span>
+        <span class="cdash-stat-value">{{ stats.confirmed|default:0 }}</span>
+      </div>
+      <div class="cdash-stat cdash-stat-slate">
+        <span class="cdash-stat-label">Inquiries sent</span>
+        <span class="cdash-stat-value">{{ inquiry_count|default:0 }}</span>
+      </div>
+    </div>
+
+    {% if next_up %}
+      <div class="cdash-next-row">
+        {% for booking in next_up %}
+          <div class="cdash-next">
+            <span class="cdash-next-icon">
+              <i class="fas {% if booking.booking_type == 'airbnb' %}fa-bed{% else %}fa-calendar-check{% endif %}"></i>
+            </span>
+            <div class="cdash-next-body">
+              <span class="cdash-next-label">
+                {% if booking.booking_type == 'airbnb' %}Your next stay{% else %}Your next viewing{% endif %}
+              </span>
+              <p class="cdash-next-title">{{ booking.listing.title }}</p>
+              <p class="cdash-next-meta">
+                {% if booking.booking_type == 'airbnb' %}
+                  <i class="fas fa-sign-in-alt"></i> {{ booking.check_in_date|date:"D, j M Y" }}
+                  {% if booking.check_in_time %}at {{ booking.check_in_time|time:"H:i" }}{% endif %}
+                  &nbsp;&middot;&nbsp;
+                  <i class="fas fa-sign-out-alt"></i> {{ booking.check_out_date|date:"D, j M Y" }}
+                  {% if booking.check_out_time %}at {{ booking.check_out_time|time:"H:i" }}{% endif %}
+                {% else %}
+                  <i class="fas fa-calendar-day"></i> {{ booking.date|date:"D, j M Y" }}
+                  {% if booking.time %}at {{ booking.time|time:"H:i" }}{% endif %}
+                {% endif %}
+                &nbsp;&middot;&nbsp; {{ booking.get_status_display }}
+              </p>
+            </div>
+            <a class="cdash-pill cdash-pill-solid" href="{% url 'listing' booking.listing.slug %}">
+              View property <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="cdash-grid">
+
+      <!-- ================= Property viewings ================= -->
+      <div class="cdash-panel" id="viewings">
+        <div class="cdash-panel-head">
+          <h2><i class="fas fa-eye"></i> Property viewings <span class="cdash-count">{{ viewings|length }}</span></h2>
+        </div>
+        <div class="cdash-panel-body">
+          {% if viewings %}
+            <ul class="cdash-list">
+              {% for booking in viewings %}
+                <li class="cdash-item">
+                  <div class="cdash-item-thumb">
+                    {% if booking.listing.photo_main %}
+                      <img src="{{ booking.listing.photo_main.url }}" alt="{{ booking.listing.title }}" loading="lazy">
+                    {% else %}
+                      <i class="fas fa-image" aria-hidden="true"></i>
+                    {% endif %}
+                  </div>
+                  <div class="cdash-item-main">
+                    <p class="cdash-item-title">
+                      <a href="{% url 'listing' booking.listing.slug %}">{{ booking.listing.title }}</a>
+                    </p>
+                    <p class="cdash-item-meta">
+                      <i class="fas fa-calendar-day"></i>
+                      {% if booking.date %}{{ booking.date|date:"D, j M Y" }}{% else %}Date to be agreed{% endif %}
+                      {% if booking.time %}&middot; {{ booking.time|time:"H:i" }}{% endif %}
+                    </p>
+                    <p class="cdash-item-meta">
+                      <i class="fas fa-user-tie"></i> {{ booking.listing.realtor }}
+                      &nbsp;&middot;&nbsp; Booked {{ booking.created_at|date:"j M Y" }}
+                    </p>
+                  </div>
+                  <div class="cdash-item-side">
+                    <span class="cdash-status cdash-status-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                    {% if booking.status == 'pending' or booking.status == 'confirmed' %}
+                      <form method="post" action="{% url 'cancel_booking' booking.id %}"
+                            onsubmit="return confirm('Cancel this viewing? This cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="cdash-link-btn cdash-link-btn-danger">
+                          <i class="fas fa-times"></i> Cancel
+                        </button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="cdash-empty">
+              <i class="fas fa-calendar-plus"></i>
+              <p>You have not scheduled any property viewings yet.</p>
+              <a class="cdash-pill" href="{% url 'listings' %}">Browse properties</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ================= Airbnb stays ================= -->
+      <div class="cdash-panel" id="stays">
+        <div class="cdash-panel-head">
+          <h2><i class="fas fa-bed"></i> Stays &amp; Airbnb <span class="cdash-count">{{ stays|length }}</span></h2>
+        </div>
+        <div class="cdash-panel-body">
+          {% if stays %}
+            <ul class="cdash-list">
+              {% for booking in stays %}
+                <li class="cdash-item">
+                  <div class="cdash-item-thumb">
+                    {% if booking.listing.photo_main %}
+                      <img src="{{ booking.listing.photo_main.url }}" alt="{{ booking.listing.title }}" loading="lazy">
+                    {% else %}
+                      <i class="fas fa-image" aria-hidden="true"></i>
+                    {% endif %}
+                  </div>
+                  <div class="cdash-item-main">
+                    <p class="cdash-item-title">
+                      <a href="{% url 'listing' booking.listing.slug %}">{{ booking.listing.title }}</a>
+                    </p>
+                    <p class="cdash-item-meta">
+                      <i class="fas fa-sign-in-alt"></i>
+                      {{ booking.check_in_date|date:"D, j M Y" }}
+                      {% if booking.check_in_time %}&middot; {{ booking.check_in_time|time:"H:i" }}{% endif %}
+                    </p>
+                    <p class="cdash-item-meta">
+                      <i class="fas fa-sign-out-alt"></i>
+                      {{ booking.check_out_date|date:"D, j M Y" }}
+                      {% if booking.check_out_time %}&middot; {{ booking.check_out_time|time:"H:i" }}{% endif %}
+                    </p>
+                  </div>
+                  <div class="cdash-item-side">
+                    <span class="cdash-status cdash-status-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                    {% if booking.status == 'pending' or booking.status == 'confirmed' %}
+                      <form method="post" action="{% url 'cancel_booking' booking.id %}"
+                            onsubmit="return confirm('Cancel this stay? This cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="cdash-link-btn cdash-link-btn-danger">
+                          <i class="fas fa-times"></i> Cancel
+                        </button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="cdash-empty">
+              <i class="fas fa-bed"></i>
+              <p>You have not booked any stays yet.</p>
+              <a class="cdash-pill" href="{% url 'listings' %}?property_type=airbnb">Browse Airbnb properties</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+
+
+
+    <div class="cdash-grid">
+
+      <!-- ================= Inquiries ================= -->
+      <div class="cdash-panel" id="inquiries">
+        <div class="cdash-panel-head">
+          <h2><i class="fas fa-comments"></i> Your inquiries <span class="cdash-count">{{ inquiry_count }}</span></h2>
+        </div>
+        <div class="cdash-panel-body">
+          {% if inquiries %}
+            <table class="cdash-mini">
+              <thead>
+                <tr>
+                  <th scope="col">Property</th>
+                  <th scope="col">Sent</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for inquiry in inquiries %}
+                  <tr>
+                    <td>{{ inquiry.listing|default:"General inquiry" }}</td>
+                    <td class="cdash-muted">{{ inquiry.contact_date|date:"j M Y" }}</td>
+                    <td><span class="cdash-status cdash-status-confirmed">Received</span></td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <div class="cdash-empty">
+              <i class="fas fa-envelope-open-text"></i>
+              <p>You have not sent any inquiries yet. Ask us anything about a property.</p>
+              <a class="cdash-pill" href="{% url 'contact' %}">Contact us</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ================= Reviews ================= -->
+      <div class="cdash-panel" id="reviews">
+        <div class="cdash-panel-head">
+          <h2><i class="fas fa-star"></i> Your reviews <span class="cdash-count">{{ testimonial_count }}</span></h2>
+        </div>
+        <div class="cdash-panel-body">
+          {% if testimonials %}
+            <ul class="cdash-list">
+              {% for review in testimonials %}
+                <li class="cdash-item">
+                  <div class="cdash-item-main">
+                    <p class="cdash-item-title">{{ review.title }}</p>
+                    <p class="cdash-item-meta">
+                      <span class="cdash-stars">
+                        {% for i in "12345" %}{% if forloop.counter <= review.rating %}&#9733;{% else %}&#9734;{% endif %}{% endfor %}
+                      </span>
+                      &nbsp;&middot;&nbsp; {{ review.created_at|date:"j M Y" }}
+                    </p>
+                  </div>
+                  <div class="cdash-item-side">
+                    {% if review.status == 'approved' %}
+                      <span class="cdash-status cdash-status-confirmed">Published</span>
+                    {% elif review.status == 'rejected' %}
+                      <span class="cdash-status cdash-status-cancelled">Not published</span>
+                    {% else %}
+                      <span class="cdash-status cdash-status-pending">In review</span>
+                    {% endif %}
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="cdash-empty">
+              <i class="fas fa-star-half-alt"></i>
+              <p>Share your experience after a viewing or stay. Reviews help other clients decide.</p>
+              <a class="cdash-pill" href="{% url 'testimonials:testimonials_list' %}">See reviews</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+{% endblock %}

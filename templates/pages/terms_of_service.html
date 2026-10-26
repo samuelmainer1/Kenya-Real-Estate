@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Terms of Service | {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1>Terms of Service</h1>
+            <p class="lead">Last updated: {{ now|date:'F d, Y' }}</p>
+            
+            <h3>Acceptance of Terms</h3>
+            <p>By accessing and using this website, you accept and agree to be bound by the terms and provision of this agreement.</p>
+            
+            <h3>Use License</h3>
+            <p>Permission is granted to temporarily download one copy of the materials on {{ site_name }}'s website for personal, non-commercial transitory viewing only.</p>
+            
+            <h3>Contact Information</h3>
+            <p>Questions about the Terms of Service should be sent to us at <a href="mailto:samuelmainer@gmail.com">samuelmainer@gmail.com</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

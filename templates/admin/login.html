@@ -1,0 +1,119 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% comment %}
+  The login screen deliberately steps outside the admin chrome: it is the first
+  thing an owner sees, so it mirrors the public website (brand navy + green,
+  Poppins, real property photography) instead of Django's default form page.
+
+  The form still posts to ``app_path`` with Django's CSRF token and ``next``
+  field, so authentication, error messages and password reset all behave
+  exactly as the stock template does.
+{% endcomment %}
+
+{% block bodyclass %}kc-login-body{% endblock %}
+{% block usertools %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+{% block content_title %}{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/admin-login.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="kc-login">
+
+  <section class="kc-login-visual" aria-hidden="true">
+    <div class="kc-login-gallery">
+      <img src="{% static 'img/real2.avif' %}" alt="" class="kc-gallery-img kc-gallery-img-1" fetchpriority="high">
+      <img src="{% static 'img/real5.avif' %}" alt="" class="kc-gallery-img kc-gallery-img-2">
+      <img src="{% static 'img/showcase.jpg' %}" alt="" class="kc-gallery-img kc-gallery-img-3">
+    </div>
+    <div class="kc-login-scrim"></div>
+
+    <div class="kc-login-visual-inner">
+      <a class="kc-login-brand" href="{% url 'admin:index' %}">
+        <img src="{% static 'img/logo.png' %}" alt="{{ kc_site_name }} logo" class="kc-login-logo">
+        <span class="kc-login-brand-text">
+          <strong>{{ kc_site_name }}</strong>
+          <span>{% trans "Control Centre" %}</span>
+        </span>
+      </a>
+
+      <div class="kc-login-pitch">
+        <p class="kc-login-eyebrow">{% trans "Staff access only" %}</p>
+        <h2>{% trans "Everything on the website, in one place." %}</h2>
+        <ul class="kc-login-bullets">
+          <li><span class="kc-bullet-dot"></span>{% trans "Publish listings, bookings and realtor profiles" %}</li>
+          <li><span class="kc-bullet-dot"></span>{% trans "Review inquiries, testimonials and comments" %}</li>
+          <li><span class="kc-bullet-dot"></span>{% trans "Track rent, tenants and maintenance" %}</li>
+          <li><span class="kc-bullet-dot"></span>{% trans "Edit site settings, SEO and legal pages" %}</li>
+        </ul>
+      </div>
+
+      <p class="kc-login-visual-foot">
+        &copy; {% now "Y" %} {{ kc_site_name }}
+      </p>
+    </div>
+  </section>
+
+  <section class="kc-login-panel">
+    <div class="kc-login-card">
+      <header class="kc-login-card-head">
+        <h1>{% trans "Sign in" %}</h1>
+        <p>{% trans "Use your staff account to open the Control Centre." %}</p>
+      </header>
+
+      {% if form.errors and not form.non_field_errors %}
+        <p class="errornote kc-login-error">
+          {% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+        </p>
+      {% endif %}
+
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+          <p class="errornote kc-login-error">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+
+      {% if user.is_authenticated %}
+        <p class="errornote kc-login-error">
+          {% blocktranslate trimmed with username=username %}
+            You are authenticated as {{ username }}, but are not authorized to
+            access this page. Would you like to login to a different account?
+          {% endblocktranslate %}
+        </p>
+      {% endif %}
+
+      <form action="{{ app_path }}" method="post" id="login-form" class="kc-login-form" autocomplete="on">
+        {% csrf_token %}
+        <div class="kc-field">
+          <label for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
+          {{ form.username }}
+          {% for error in form.username.errors %}<p class="kc-field-error">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="kc-field">
+          <label for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
+          {{ form.password }}
+          <input type="hidden" name="next" value="{{ next }}">
+          {% for error in form.password.errors %}<p class="kc-field-error">{{ error }}</p>{% endfor %}
+        </div>
+
+        <button type="submit" class="kc-login-submit">{% trans "Sign in to the Control Centre" %}</button>
+      </form>
+
+      <footer class="kc-login-card-foot">
+        {% url 'admin_password_reset' as password_reset_url %}
+        {% if password_reset_url %}
+          <a href="{{ password_reset_url }}">{% trans "Forgotten your login credentials?" %}</a>
+        {% endif %}
+        <a href="{% url 'index' %}" class="kc-login-back">&larr; {% trans "Back to the website" %}</a>
+      </footer>
+    </div>
+  </section>
+</div>
+{% endblock %}

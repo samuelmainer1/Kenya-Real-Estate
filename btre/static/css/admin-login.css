@@ -1,0 +1,419 @@
+/* Branded admin login (templates/admin/login.html).
+ *
+ * Mirrors the public site: brand navy (#10284e) + green (#30caa0), Poppins for
+ * headings, and real property photography on the left. A two-pane split that
+ * collapses to a single centred card on narrow screens.
+ *
+ * Colours are literal here (not admin CSS variables) because the login page is
+ * a brand statement rather than a themed form. The card has its own opaque
+ * background, so it stays legible for dark-mode users too.
+ */
+
+/* ---------- Page shell ---------- */
+
+body.kc-login-body {
+  margin: 0;
+  background: #f4f7fb;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* The stock login page still renders an empty header and footer; the split
+   layout needs the whole viewport, so both are removed. */
+body.kc-login-body header#header,
+body.kc-login-body #footer {
+  display: none;
+}
+
+body.kc-login-body #container {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: transparent;
+  border: 0;
+}
+
+body.kc-login-body #main {
+  display: block;
+  padding: 0;
+  background: transparent;
+}
+
+body.kc-login-body #content {
+  padding: 0;
+  max-width: none;
+}
+
+/* ---------- Split layout ---------- */
+
+.kc-login {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  min-height: 100vh;
+}
+
+/* ---------- Left: property photography ---------- */
+
+.kc-login-visual {
+  position: relative;
+  overflow: hidden;
+  background: #0a1a33;
+  isolation: isolate;
+}
+
+.kc-login-gallery {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px;
+}
+
+.kc-gallery-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.kc-gallery-img-1 { grid-column: 1 / -1; grid-row: 1 / 3; }
+.kc-gallery-img-2 { grid-column: 1; grid-row: 3; }
+.kc-gallery-img-3 { grid-column: 2; grid-row: 3; }
+
+/* Brand gradient scrim: keeps the copy readable over any photograph. */
+.kc-login-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(160deg, rgba(16, 40, 78, 0.95) 0%, rgba(16, 40, 78, 0.72) 45%, rgba(13, 92, 71, 0.86) 100%),
+    radial-gradient(120% 90% at 15% 0%, rgba(48, 202, 160, 0.42) 0%, rgba(48, 202, 160, 0) 55%);
+}
+
+.kc-login-visual-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 40px 48px;
+  color: #fff;
+}
+
+.kc-login-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.kc-login-logo {
+  width: 46px;
+  height: 46px;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  background: #fff;
+  object-fit: contain;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+}
+
+.kc-login-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.kc-login-brand-text strong {
+  font-family: Poppins, "Segoe UI", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.kc-login-brand-text span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7ff0cd;
+}
+
+.kc-login-pitch {
+  max-width: 460px;
+}
+
+.kc-login-eyebrow {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(48, 202, 160, 0.45);
+  background: rgba(48, 202, 160, 0.18);
+  color: #9ff7dd;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.kc-login-pitch h2 {
+  margin: 0 0 22px;
+  font-family: Poppins, "Segoe UI", sans-serif;
+  font-size: clamp(26px, 2.6vw, 36px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.kc-login-bullets {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kc-login-bullets li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.kc-bullet-dot {
+  position: relative;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 1px solid rgba(48, 202, 160, 0.6);
+  background: rgba(48, 202, 160, 0.22);
+}
+
+.kc-bullet-dot::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #30caa0;
+}
+
+.kc-login-visual-foot {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ---------- Right: the login card ---------- */
+
+.kc-login-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  background:
+    radial-gradient(circle at 80% 0%, rgba(48, 202, 160, 0.1), transparent 55%),
+    #f4f7fb;
+}
+
+.kc-login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 34px 34px 26px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(16, 40, 78, 0.12), 0 2px 6px rgba(16, 40, 78, 0.06);
+}
+
+.kc-login-card-head h1 {
+  margin: 0 0 6px;
+  font-family: Poppins, "Segoe UI", sans-serif;
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #10284e;
+}
+
+.kc-login-card-head p {
+  margin: 0 0 22px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+/* ---------- Errors ---------- */
+
+.kc-login-error,
+body.kc-login-body .errornote {
+  margin: 0 0 16px;
+  padding: 10px 13px;
+  border-radius: 9px;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #ef4444;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* ---------- Form ---------- */
+
+.kc-login-form {
+  display: grid;
+  gap: 16px;
+}
+
+.kc-field {
+  display: grid;
+  gap: 6px;
+}
+
+.kc-field label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+body.kc-login-body .kc-field input[type="text"],
+body.kc-login-body .kc-field input[type="password"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 13px;
+  border: 1.5px solid #d7dfe9;
+  border-radius: 9px;
+  background: #fbfdff;
+  color: #0f172a;
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+body.kc-login-body .kc-field input:focus {
+  outline: none;
+  border-color: #30caa0;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(48, 202, 160, 0.22);
+}
+
+.kc-field-error {
+  margin: 0;
+  font-size: 12px;
+  color: #b91c1c;
+}
+
+body.kc-login-body .kc-login-submit {
+  margin-top: 4px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #10284e 0%, #1b5c8a 100%);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(16, 40, 78, 0.22);
+  transition: transform 0.12s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+body.kc-login-body .kc-login-submit:hover,
+body.kc-login-body .kc-login-submit:focus {
+  filter: brightness(1.12);
+  box-shadow: 0 10px 26px rgba(16, 40, 78, 0.28);
+}
+
+body.kc-login-body .kc-login-submit:active {
+  transform: translateY(1px);
+}
+
+/* ---------- Card footer ---------- */
+
+.kc-login-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #eef2f7;
+  font-size: 12.5px;
+}
+
+.kc-login-card-foot a {
+  color: #0f766e;
+  text-decoration: none;
+}
+
+.kc-login-card-foot a:hover {
+  text-decoration: underline;
+}
+
+.kc-login-back {
+  color: #64748b !important;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 980px) {
+  .kc-login {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .kc-login-visual {
+    min-height: 230px;
+  }
+
+  .kc-login-visual-inner {
+    padding: 26px 24px;
+    gap: 18px;
+  }
+
+  .kc-login-pitch h2 {
+    margin-bottom: 12px;
+    font-size: 22px;
+  }
+
+  .kc-login-bullets,
+  .kc-login-visual-foot {
+    display: none;
+  }
+
+  .kc-login-panel {
+    padding: 26px 18px 40px;
+  }
+
+  .kc-login-card {
+    padding: 26px 22px 20px;
+    box-shadow: 0 12px 30px rgba(16, 40, 78, 0.1);
+  }
+}
+
+@media (max-width: 560px) {
+  .kc-login-visual {
+    min-height: 170px;
+  }
+
+  .kc-login-pitch {
+    display: none;
+  }
+
+  .kc-login-brand-text strong {
+    font-size: 15px;
+  }
+}

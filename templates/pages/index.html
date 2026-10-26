@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ site_name }} | Find Homes, Rentals & Airbnb in Kenya{% endblock %}
+
+{% block meta_description %}Discover verified properties across Kenya with {{ site_name }}. Browse homes for sale, rentals, Airbnb stays, and commercial listings with expert agent support.{% endblock %}
+
+{% block og_title %}{{ site_name }} | Kenya Property Listings & Rentals{% endblock %}
+
+{% block og_description %}Search premium real estate in Kenya — homes, apartments, Airbnb, and investment properties on one trusted platform.{% endblock %}
+
+{% block og_image %}{{ site_url }}{% static 'img/showcase.avif' %}{% endblock %}
+
+{% block meta %}
+  <meta name="geo.position" content="-1.2921;36.8219">
+  <meta name="ICBM" content="-1.2921, 36.8219">
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="{% static 'css/listings.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/hero-carousel.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Premium Hero Section with Carousel -->
+<section class="premium-hero">
+  <div class="hero-carousel">
+    <div class="hero-slide active"></div>
+    <div class="hero-slide"></div>
+    <div class="hero-slide"></div>
+  </div>
+  
+  <div class="hero-content">
+    <div class="hero-badge">
+      <i class="fas fa-star"></i>
+      <span>Kenya's Premier Real Estate Platform</span>
+    </div>
+    
+    <h1 class="hero-title">
+      Find Your Dream Home in
+      <span class="gradient-text">Kenya</span>
+    </h1>
+    
+    
+    
+    <div class="hero-cta-group">
+      <a href="{% url 'listings' %}" class="hero-btn-primary">
+        <i class="fas fa-search"></i>
+        Browse Properties
+      </a>
+          <a href="{% url 'property_management' %}" class="hero-btn-primary">
+            <i class="fas fa-search"></i>
+            Property Management</a>
+    </div>
+    
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-number">500+</span>
+        <span class="hero-stat-label">Properties</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-number">50+</span>
+        <span class="hero-stat-label">Agents</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-number">1000+</span>
+        <span class="hero-stat-label">Happy Clients</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Carousel Indicators -->
+  <div class="hero-indicators">
+    <div class="hero-indicator active" data-slide="0"></div>
+    <div class="hero-indicator" data-slide="1"></div>
+    <div class="hero-indicator" data-slide="2"></div>
+  </div>
+</section>
+
+<!-- Premium Search Section -->
+<section class="premium-search">
+  <div class="search-container">
+    <div class="search-header">
+      <h2 class="search-title">Find Your Perfect Property</h2>
+      <p class="search-subtitle">Search through our extensive collection of verified properties across Kenya</p>
+    </div>
+    
+    <form class="search-form" method="GET" action="{% url 'search' %}">
+      <div class="search-group">
+        <label for="keywords">Keywords</label>
+        <input type="text" id="keywords" name="keywords" placeholder="Enter keywords...">
+      </div>
+      
+      <div class="search-group">
+        <label for="city">City</label>
+        <select id="city" name="city">
+          <option value="">All Cities</option>
+          <option value="Nairobi">Nairobi</option>
+          <option value="Mombasa">Mombasa</option>
+          <option value="Kisumu">Kisumu</option>
+          <option value="Nakuru">Nakuru</option>
+          <option value="Eldoret">Eldoret</option>
+        </select>
+      </div>
+      
+      <div class="search-group">
+        <label for="bedrooms">Bedrooms</label>
+        <select id="bedrooms" name="bedrooms">
+          <option value="">Any</option>
+          <option value="1">1+</option>
+          <option value="2">2+</option>
+          <option value="3">3+</option>
+          <option value="4">4+</option>
+        </select>
+      </div>
+      
+      <div class="search-group">
+        <label for="price">Max Price</label>
+        <select id="price" name="price">
+          <option value="">Any Price</option>
+          <option value="1000">Ksh 1,000</option>
+          <option value="5000">Ksh 5,000</option>
+          <option value="10000">Ksh 10,000</option>
+          <option value="25000">Ksh 25,000</option>
+          <option value="50000">Ksh 50,000</option>
+          <option value="100000">Ksh 100,000</option>
+          <option value="250000">Ksh 250,000</option>
+          <option value="500000">Ksh 500,000</option>
+          <option value="1000000">Ksh 1M</option>
+          <option value="2500000">Ksh 2.5M</option>
+          <option value="5000000">Ksh 5M</option>
+          <option value="10000000">Ksh 10M</option>
+          <option value="25000000">Ksh 25M</option>
+          <option value="50000000">Ksh 50M</option>
+          <option value="100000000">Ksh 100M</option>
+          <option value="250000000">Ksh 250M</option>
+          <option value="500000000">Ksh 500M</option>
+          <option value="1000000000">Ksh 1B+</option>
+        </select>
+      </div>
+      
+      <button type="submit" class="search-btn">
+        <i class="fas fa-search"></i>
+        Search Properties
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- Alerts -->
+{% include 'partials/_alerts.html' %}
+
+<!-- Featured Listings Section -->
+<section class="featured-listings">
+  <div class="section-header">
+    <h2 class="section-title">Featured Properties</h2>
+    <p class="section-subtitle">Discover our handpicked selection of premium properties</p>
+  </div>
+
+  <div class="container">
+    {% include 'partials/_listings_grid.html' %}
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="{% url 'listings' %}" class="cta-btn">View All Listings</a>
+  </div>
+</section>
+
+<!-- Services Section -->
+<section class="services-section">
+  <div class="section-header">
+    <h2 class="section-title">Why Choose {{ site_name }}?</h2>
+    <p class="section-subtitle">We provide comprehensive real estate services with expertise and dedication</p>
+  </div>
+  
+  <div class="services-grid">
+    {% for service in featured_services %}
+    <a href="{{ service.get_absolute_url }}" class="service-card">
+      <div class="service-icon">
+        <i class="{{ service.icon_class }}"></i>
+      </div>
+      <h3 class="service-title">{{ service.title }}</h3>
+      <p class="service-description">{{ service.short_description }}</p>
+      <div class="service-btn">
+        Find Out More
+      </div>
+    </a>
+    {% empty %}
+    <!-- Fallback static services if no dynamic services exist -->
+    <div class="service-card">
+      <div class="service-icon">
+        <i class="fas fa-home"></i>
+      </div>
+      <h3 class="service-title">Property Sales</h3>
+      <p class="service-description">
+        Expert guidance through the entire sales process, from listing to closing. 
+        Get the best value for your property with our market expertise.
+      </p>
+    </div>
+    {% endfor %}
+  </div>
+  
+  {% if featured_services|length > 4 %}
+  <div class="services-view-all">
+    <a href="{% url 'services' %}" class="view-all-btn">
+      <i class="fas fa-th-large"></i>
+      View All Services
+    </a>
+  </div>
+  {% endif %}
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="cta-content">
+    <h2 class="cta-title">Ready to Find Your Dream Property?</h2>
+    <p class="cta-description">
+      Join thousands of satisfied clients who found their perfect home with {{ site_name }}. 
+      Start your journey today and experience the difference.
+    </p>
+    <a href="{% url 'listings' %}" class="cta-btn">
+      <i class="fas fa-search"></i>
+      Start Your Search
+    </a>
+  </div>
+</section>
+{% endblock %}

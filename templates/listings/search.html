@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Search Properties | {{ site_name }}{% endblock %}
+
+{% block meta_description %}Search homes, apartments, land and commercial property for sale and rent across Kenya on {{ site_name }}.{% endblock %}
+
+{% block robots %}noindex, follow{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/search.css' %}">
+  <link rel="stylesheet" href="{% static 'css/listings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="listings-page">
+  {% include 'partials/_searchbar.html' %}
+
+  <section class="property-categories">
+    <div class="container">
+      <div class="category-filters">
+        <h4><i class="fas fa-filter"></i> Filter by Property Type</h4>
+        <div class="category-buttons">
+          <a href="{% url 'search' %}" class="category-btn {% if not values.property_type %}active{% endif %}">
+            <i class="fas fa-home"></i> All <span class="count">{{ total_count }}</span>
+          </a>
+          <a href="?property_type=sale{% if values.keywords %}&keywords={{ values.keywords }}{% endif %}{% if values.city %}&city={{ values.city }}{% endif %}{% if values.state %}&state={{ values.state }}{% endif %}{% if values.bedrooms %}&bedrooms={{ values.bedrooms }}{% endif %}{% if values.price %}&price={{ values.price }}{% endif %}"
+             class="category-btn category-sale {% if values.property_type == 'sale' %}active{% endif %}">
+            <i class="fas fa-tag"></i> For Sale <span class="count">{{ property_counts.sale }}</span>
+          </a>
+          <a href="?property_type=rent{% if values.keywords %}&keywords={{ values.keywords }}{% endif %}{% if values.city %}&city={{ values.city }}{% endif %}{% if values.state %}&state={{ values.state }}{% endif %}{% if values.bedrooms %}&bedrooms={{ values.bedrooms }}{% endif %}{% if values.price %}&price={{ values.price }}{% endif %}"
+             class="category-btn category-rent {% if values.property_type == 'rent' %}active{% endif %}">
+            <i class="fas fa-key"></i> For Rent <span class="count">{{ property_counts.rent }}</span>
+          </a>
+          <a href="?property_type=airbnb{% if values.keywords %}&keywords={{ values.keywords }}{% endif %}{% if values.city %}&city={{ values.city }}{% endif %}{% if values.state %}&state={{ values.state }}{% endif %}{% if values.bedrooms %}&bedrooms={{ values.bedrooms }}{% endif %}{% if values.price %}&price={{ values.price }}{% endif %}"
+             class="category-btn category-airbnb {% if values.property_type == 'airbnb' %}active{% endif %}">
+            <i class="fas fa-bed"></i> Airbnb <span class="count">{{ property_counts.airbnb }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="listings-page-hero">
+    <div class="container">
+      <h1>
+        {% if values.property_type %}
+          {{ values.property_type|title }} Properties
+        {% else %}
+          Search Results
+        {% endif %}
+      </h1>
+      <p>Found {{ listings.count }} propert{{ listings.count|pluralize:"y,ies" }} matching your criteria</p>
+    </div>
+  </section>
+
+  <div class="container listings-breadcrumb">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}"><i class="fas fa-home"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listings' %}">Browse Listings</a></li>
+        <li class="breadcrumb-item active">Search Results</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="listings-section">
+    <div class="container">
+      {% if listings %}
+        {% if values.property_type or values.keywords or values.city or values.bedrooms or values.price %}
+          <div class="search-results-info">
+            <h4><i class="fas fa-sliders-h"></i> Active Filters</h4>
+            <div class="active-filters">
+              {% if values.property_type %}
+                <span class="filter-tag">
+                  <strong>Type:</strong> {{ values.property_type|capfirst }}
+                  <a href="?{% if values.keywords %}keywords={{ values.keywords }}&{% endif %}{% if values.city %}city={{ values.city }}&{% endif %}{% if values.state %}state={{ values.state }}&{% endif %}{% if values.bedrooms %}bedrooms={{ values.bedrooms }}&{% endif %}{% if values.price %}price={{ values.price }}{% endif %}" class="remove-filter">×</a>
+                </span>
+              {% endif %}
+              {% if values.keywords %}
+                <span class="filter-tag">
+                  <strong>Keywords:</strong> {{ values.keywords }}
+                  <a href="?{% if values.property_type %}property_type={{ values.property_type }}&{% endif %}{% if values.city %}city={{ values.city }}&{% endif %}{% if values.state %}state={{ values.state }}&{% endif %}{% if values.bedrooms %}bedrooms={{ values.bedrooms }}&{% endif %}{% if values.price %}price={{ values.price }}{% endif %}" class="remove-filter">×</a>
+                </span>
+              {% endif %}
+              {% if values.city %}
+                <span class="filter-tag">
+                  <strong>City:</strong> {{ values.city }}
+                  <a href="?{% if values.property_type %}property_type={{ values.property_type }}&{% endif %}{% if values.keywords %}keywords={{ values.keywords }}&{% endif %}{% if values.state %}state={{ values.state }}&{% endif %}{% if values.bedrooms %}bedrooms={{ values.bedrooms }}&{% endif %}{% if values.price %}price={{ values.price }}{% endif %}" class="remove-filter">×</a>
+                </span>
+              {% endif %}
+              {% if values.bedrooms %}
+                <span class="filter-tag">
+                  <strong>Bedrooms:</strong> {{ values.bedrooms }}+
+                  <a href="?{% if values.property_type %}property_type={{ values.property_type }}&{% endif %}{% if values.keywords %}keywords={{ values.keywords }}&{% endif %}{% if values.city %}city={{ values.city }}&{% endif %}{% if values.state %}state={{ values.state }}&{% endif %}{% if values.price %}price={{ values.price }}{% endif %}" class="remove-filter">×</a>
+                </span>
+              {% endif %}
+              {% if values.price %}
+                <span class="filter-tag">
+                  <strong>Max Price:</strong> Ksh {{ values.price|floatformat:0|intcomma }}
+                  <a href="?{% if values.property_type %}property_type={{ values.property_type }}&{% endif %}{% if values.keywords %}keywords={{ values.keywords }}&{% endif %}{% if values.city %}city={{ values.city }}&{% endif %}{% if values.state %}state={{ values.state }}&{% endif %}{% if values.bedrooms %}bedrooms={{ values.bedrooms }}{% endif %}" class="remove-filter">×</a>
+                </span>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="listings-section-header">
+          <h2>Search Results</h2>
+          <span class="listings-count">{{ listings.count }} found</span>
+        </div>
+        {% include 'partials/_listings_grid.html' with listings=listings %}
+      {% else %}
+        <div class="no-results">
+          <i class="fas fa-search"></i>
+          <h4>No Properties Found</h4>
+          <p>We couldn't find any properties matching your search criteria. Try adjusting your filters or browse all listings.</p>
+          <a href="{% url 'listings' %}" class="back-to-listings">
+            <i class="fas fa-home"></i> Browse All Listings
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

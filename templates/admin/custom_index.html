@@ -1,0 +1,173 @@
+{% extends "admin/index.html" %}
+{% load i18n static humanize %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/admin-dashboard.css' %}">
+{% endblock %}
+
+{% comment %}
+  admin/index.html blanks `nav-sidebar` because its own layout puts the
+  "Recent actions" panel where the app list would go. The Control Centre wants
+  the grouped navigation everywhere, so re-state it here. `super()` would
+  render the parent's empty block, hence the explicit include.
+{% endcomment %}
+{% block nav-sidebar %}{% include "admin/nav_sidebar.html" %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  <div class="kdash-header">
+    <div>
+      <h1 class="kdash-title">{% trans "Control Centre" %}</h1>
+      <p class="kdash-subtitle">
+        {% blocktrans with day=today|date:"l, j F Y" %}Everything on the public site is managed here. Today is {{ day }}.{% endblocktrans %}
+      </p>
+    </div>
+    <div class="kdash-header-actions">
+      {% if can_add_listing %}
+        <a class="kdash-btn kdash-btn-primary" href="{% url 'admin:listings_listing_add' %}">+ {% trans "New listing" %}</a>
+      {% endif %}
+      {% if can_change_seo %}
+        <a class="kdash-btn kdash-btn-ghost" href="{% url 'admin:legal_seosettings_changelist' %}">{% trans "SEO settings" %}</a>
+      {% endif %}
+      {% if can_view_analytics %}
+        <a class="kdash-btn kdash-btn-ghost" href="{% url 'analytics_dashboard' %}" target="_blank" rel="noopener">{% trans "Analytics dashboard" %} ↗</a>
+      {% endif %}
+      <a class="kdash-btn kdash-btn-ghost" href="{{ site_url|default:'/' }}" target="_blank" rel="noopener">{% trans "View site" %} ↗</a>
+    </div>
+  </div>
+
+  {% if kpis %}
+  <ul class="kdash-kpis">
+    {% for kpi in kpis %}
+      <li class="kdash-kpi kdash-kpi-{{ kpi.tone }}">
+        {% if kpi.url %}<a href="{{ kpi.url }}">{% else %}<span>{% endif %}
+          <span class="kdash-kpi-label">{{ kpi.label }}</span>
+          <span class="kdash-kpi-value">
+            {% if kpi.is_currency %}KSh {{ kpi.value|intcomma }}{% else %}{{ kpi.value|intcomma }}{% endif %}
+          </span>
+          <span class="kdash-kpi-meta">{{ kpi.meta }}</span>
+        {% if kpi.url %}</a>{% else %}</span>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <div class="kdash-columns">
+    <div class="kdash-col-main">
+      <section class="kdash-panel">
+        <header class="kdash-panel-head">
+          <h3>{% trans "Needs your attention" %}</h3>
+          {% if attention_items %}
+            <span class="kdash-badge">{{ attention_items|length }}</span>
+          {% endif %}
+        </header>
+
+        {% if attention_items %}
+          <ul class="kdash-attention">
+            {% for item in attention_items %}
+              <li class="kdash-attention-item">
+                <div class="kdash-attention-top">
+                  <span class="kdash-attention-count">{{ item.count }}</span>
+                  <div>
+                    <p class="kdash-attention-title">{{ item.title }}</p>
+                    <p class="kdash-attention-desc">{{ item.description }}</p>
+                  </div>
+                  {% if item.action_url %}
+                    <a class="kdash-btn kdash-btn-small" href="{{ item.action_url }}">{{ item.action_label }}</a>
+                  {% endif %}
+                </div>
+                {% if item.items %}
+                  <ul class="kdash-sublist">
+                    {% for sub in item.items %}
+                      <li>
+                        {% if sub.url %}<a href="{{ sub.url }}">{{ sub.label }}</a>{% else %}<span>{{ sub.label }}</span>{% endif %}
+                        <span class="kdash-sublist-detail">{{ sub.detail }}</span>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="kdash-empty">
+            <strong>{% trans "You are all caught up." %}</strong>
+            {% trans "Nothing is waiting on an admin decision right now." %}
+          </p>
+        {% endif %}
+      </section>
+
+      <section class="kdash-panel">
+        <header class="kdash-panel-head">
+          <h3>{% trans "Recent activity" %}</h3>
+        </header>
+        {% if recent_activity %}
+          <ul class="kdash-feed">
+            {% for event in recent_activity %}
+              <li>
+                <span class="kdash-feed-kind kdash-feed-{{ event.kind|lower }}">{{ event.kind }}</span>
+                <span class="kdash-feed-text">
+                  {% if event.url %}<a href="{{ event.url }}">{{ event.text }}</a>{% else %}{{ event.text }}{% endif %}
+                </span>
+                <time class="kdash-feed-when">{{ event.when|naturaltime }}</time>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="kdash-empty">{% trans "No activity recorded yet." %}</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <aside class="kdash-col-side">
+      {% for group in quick_action_groups %}
+        <section class="kdash-panel kdash-panel-compact">
+          <header class="kdash-panel-head">
+            <h3>{{ group.title }}</h3>
+          </header>
+          <ul class="kdash-links">
+            {% for link in group.links %}
+              <li>
+                <a href="{{ link.changelist }}">{{ link.label }}</a>
+                {% if link.add %}<a class="kdash-add" href="{{ link.add }}" title="{% blocktrans with name=link.label %}Add {{ name }}{% endblocktrans %}">+</a>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endfor %}
+
+      {% if kc_site_groups %}
+        <section class="kdash-panel kdash-panel-compact">
+          <header class="kdash-panel-head">
+            <h3>{% translate "Site shortcuts" %}</h3>
+          </header>
+          {% for group in kc_site_groups %}
+            <p class="kdash-links-label">{{ group.title }}</p>
+            <ul class="kdash-links kdash-links-grid">
+              {% for link in group.links %}
+                <li><a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }} ↗</a></li>
+              {% endfor %}
+            </ul>
+          {% endfor %}
+        </section>
+      {% endif %}
+    </aside>
+  </div>
+
+  <details class="kdash-apps">
+    <summary>{% trans "Browse all registered models" %}</summary>
+    <p class="kdash-apps-hint">
+      {% trans "The Control Centre sidebar already lists every model grouped by area — this is Django's complete, unfiltered index for reference." %}
+    </p>
+    <div class="kdash-apps-inner">
+      {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+    </div>
+  </details>
+
+</div>
+{% endblock %}
+

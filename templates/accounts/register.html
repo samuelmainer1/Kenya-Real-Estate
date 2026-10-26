@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register | {{ site_name }}{% endblock %}
+{% block meta_description %}Create your {{ site_name }} account to save listings, manage bookings, and track your property inquiries.{% endblock %}
+
+{% block content %}
+<style>
+  .register-bg {
+    min-height: 100vh;
+    background: url('https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1500&q=80') no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .register-glass-card {
+    background: rgba(255,255,255,0.85);
+    border-radius: 2.2rem;
+    box-shadow: 0 8px 40px rgba(32,134,107,0.13);
+    padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+    max-width: 440px;
+    width: 100%;
+    margin: 3rem auto;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(10px) saturate(120%);
+    border: 1.5px solid rgba(32,134,107,0.10);
+    animation: fadeInUp 1.2s cubic-bezier(.39,.575,.56,1.000);
+  }
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(40px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .register-glass-card h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #20866b;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  .register-form-group {
+    margin-bottom: 1.3rem;
+    position: relative;
+  }
+  .register-form-group label {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #20866b;
+    font-size: 1.05rem;
+    pointer-events: none;
+    transition: all 0.2s;
+    opacity: 0.7;
+  }
+  .register-form-group input:focus + label,
+  .register-form-group input:not(:placeholder-shown) + label {
+    top: -0.7rem;
+    left: 1rem;
+    font-size: 0.92rem;
+    background: #fff;
+    padding: 0 0.3rem;
+    border-radius: 0.5rem;
+    opacity: 1;
+  }
+  .register-form-group input {
+    width: 100%;
+    border-radius: 2rem;
+    border: 1.5px solid #e4e4e4;
+    padding: 1rem 1.2rem 1rem 2.2rem;
+    font-size: 1.08rem;
+    background: rgba(255,255,255,0.96);
+    box-shadow: 0 2px 8px rgba(32,134,107,0.04);
+    transition: border 0.2s;
+  }
+  .register-form-group input:focus {
+    border: 1.5px solid #20866b;
+    box-shadow: 0 2px 12px rgba(32,134,107,0.10);
+  }
+  .register-btn {
+    width: 100%;
+    font-size: 1.15rem;
+    font-weight: 700;
+    border-radius: 2em;
+    padding: 0.9em 0;
+    background: linear-gradient(90deg, #20866b 0%, #1fc8db 100%);
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 12px rgba(32,134,107,0.10);
+    margin-bottom: 1.2rem;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .register-btn:hover {
+    background: linear-gradient(90deg, #1fc8db 0%, #20866b 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 24px rgba(32,134,107,0.18);
+  }
+  .register-links {
+    text-align: center;
+    margin-top: 1.2rem;
+  }
+  .register-links a {
+    color: #20866b;
+    font-weight: 600;
+    margin: 0 0.7rem;
+    text-decoration: underline;
+    transition: color 0.2s;
+  }
+  .register-links a:hover {
+    color: #1fc8db;
+  }
+</style>
+<div class="register-bg">
+  <div class="register-glass-card">
+    <h2>Create Your Account</h2>
+    <form method="post" action="{% url 'register' %}">
+      {% csrf_token %}
+      <div class="register-form-group">
+        <input type="text" name="first_name" id="id_first_name" placeholder=" " required>
+        <label for="id_first_name">First Name</label>
+      </div>
+      <div class="register-form-group">
+        <input type="text" name="last_name" id="id_last_name" placeholder=" " required>
+        <label for="id_last_name">Last Name</label>
+      </div>
+      <div class="register-form-group">
+        <input type="text" name="username" id="id_username" placeholder=" " required>
+        <label for="id_username">Username</label>
+      </div>
+      <div class="register-form-group">
+        <input type="email" name="email" id="id_email" placeholder=" " required>
+        <label for="id_email">Email</label>
+      </div>
+      <div class="register-form-group">
+        <input type="password" name="password" id="id_password" placeholder=" " required>
+        <label for="id_password">Password</label>
+      </div>
+      <div class="register-form-group">
+        <input type="password" name="password2" id="id_password2" placeholder=" " required>
+        <label for="id_password2">Confirm Password</label>
+      </div>
+      <button type="submit" class="register-btn">Register</button>
+    </form>
+    <div class="register-links">
+      <a href="{% url 'login' %}">Already have an account? Login</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
